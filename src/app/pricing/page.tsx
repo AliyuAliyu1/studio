@@ -26,6 +26,9 @@ function Header() {
         <Button asChild variant="outline">
           <Link href="/login">Sign In</Link>
         </Button>
+         <Button asChild>
+          <Link href="/signup">Sign Up</Link>
+        </Button>
       </nav>
     </header>
   );
