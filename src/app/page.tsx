@@ -21,8 +21,8 @@ function Header() {
   return (
     <header className="px-4 lg:px-6 h-16 flex items-center justify-between bg-background">
       <Logo />
-      <nav className="hidden lg:flex gap-6">
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
+      <nav className="hidden lg:flex gap-6 absolute left-1/2 -translate-x-1/2">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#how-it-works">
           How It Works
         </Link>
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="/pricing">
@@ -114,28 +114,85 @@ function HeroImage() {
     )
 }
 
+function BrainIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+      <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v0A2.5 2.5 0 0 1 9.5 7v0A2.5 2.5 0 0 1 7 4.5v0A2.5 2.5 0 0 1 9.5 2Z" />
+        <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v0A2.5 2.5 0 0 0 14.5 7v0A2.5 2.5 0 0 0 17 4.5v0A2.5 2.5 0 0 0 14.5 2Z" />
+        <path d="M12 17.5a2.5 2.5 0 0 1-2.5-2.5v-1A2.5 2.5 0 0 1 12 11.5v0A2.5 2.5 0 0 1 14.5 14v1a2.5 2.5 0 0 1-2.5 2.5Z" />
+        <path d="M18 12.5a2.5 2.5 0 0 1-2.5-2.5v-1A2.5 2.5 0 0 1 18 6.5v0a2.5 2.5 0 0 1 2.5 2.5v1A2.5 2.5 0 0 1 18 12.5Z" />
+        <path d="M6 12.5a2.5 2.5 0 0 0 2.5-2.5v-1A2.5 2.5 0 0 0 6 6.5v0A2.5 2.5 0 0 0 3.5 9v1a2.5 2.5 0 0 0 2.5 2.5Z" />
+        <path d="M12 12a2.5 2.5 0 0 0-2.5-2.5V7A2.5 2.5 0 0 0 12 4.5v0A2.5 2.5 0 0 0 14.5 7v2.5A2.5 2.5 0 0 0 12 12Z" />
+        <path d="M18.5 22a2.5 2.5 0 0 1-2.5-2.5v-1a2.5 2.5 0 0 1 2.5-2.5v0a2.5 2.5 0 0 1 2.5 2.5v1a2.5 2.5 0 0 1-2.5 2.5Z" />
+        <path d="M5.5 22a2.5 2.5 0 0 0 2.5-2.5v-1a2.5 2.5 0 0 0-2.5-2.5v0A2.5 2.5 0 0 0 3 19.5v1a2.5 2.5 0 0 0 2.5 2.5Z" />
+      </svg>
+    )
+}
+
 export default function Home() {
   const features = [
     {
-      icon: <UploadCloud className="h-8 w-8 text-indigo-600" />,
+      icon: <UploadCloud className="h-6 w-6 text-blue-600" />,
+      bgColor: "bg-blue-100",
       title: 'Upload Customer Feedback',
       description: 'Import feedback from surveys, reviews, or support tickets.',
     },
     {
-      icon: <Bot className="h-8 w-8 text-indigo-600" />,
+      icon: <BrainIcon className="h-6 w-6 text-purple-600" />,
+      bgColor: "bg-purple-100",
       title: 'Let AI Analyze and Summarize It',
       description: 'AI identifies key themes and sentiment automatically.',
     },
     {
-      icon: <FileText className="h-8 w-8 text-indigo-600" />,
+      icon: <FileText className="h-6 w-6 text-green-600" />,
+      bgColor: "bg-green-100",
       title: 'Generate Blog Posts, Tweets, or Microsites',
       description: 'Create content that resonates with your audience.',
     },
     {
-        icon: <Share className="h-8 w-8 text-indigo-600" />,
+        icon: <Share className="h-6 w-6 text-orange-600" />,
+        bgColor: "bg-orange-100",
         title: 'Export, Edit, or Publish with Your Branding',
         description: 'Maintain brand consistency across all content.',
       },
+  ];
+
+  const howItWorksSteps = [
+    {
+      number: 1,
+      title: 'Paste or upload feedback',
+      description: 'Import from any source - CSV, lexl, or direct paste',
+      color: 'bg-blue-600',
+    },
+    {
+      number: 2,
+      title: 'Choose a content type',
+      description: 'Select from blog posts, social media, or microsites',
+      color: 'bg-purple-600',
+    },
+    {
+      number: 3,
+      title: 'Click generate',
+      description: 'AI creates content based on feedback insights',
+      color: 'bg-green-600',
+    },
+    {
+      number: 4,
+      title: 'Edit and publish',
+      description: 'Customize and share with your brand styling',
+      color: 'bg-orange-600',
+    },
   ];
 
   return (
@@ -165,29 +222,48 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50/50">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50/50">
             <div className="container px-4 md:px-6">
-                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                    <div className="space-y-2">
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What You Can Do in One Click</h2>
-                    </div>
-                </div>
                 <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
                    {features.map((feature, index) => (
-                    <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white">
-                        <CardHeader className="flex flex-col items-center p-6 text-center">
-                             <div className="bg-indigo-100 p-4 rounded-lg mb-4">
+                    <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white rounded-xl">
+                        <CardHeader className="flex flex-col items-start p-6">
+                             <div className={`p-3 rounded-lg mb-4 ${feature.bgColor}`}>
                                 {feature.icon}
                             </div>
-                            <CardTitle className="text-lg font-bold">{feature.title}</CardTitle>
+                            <CardTitle className="text-base font-bold text-left">{feature.title}</CardTitle>
                         </CardHeader>
-                        <CardContent className="text-muted-foreground text-center p-6 pt-0">
+                        <CardContent className="text-muted-foreground text-left p-6 pt-0">
                             <p className="text-sm">{feature.description}</p>
                         </CardContent>
                     </Card>
                 ))}
                 </div>
             </div>
+        </section>
+
+        <section id="how-it-works" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">How It Works</h2>
+            </div>
+            <div className="grid gap-12 md:grid-cols-4">
+              {howItWorksSteps.map((step) => (
+                <div key={step.number} className="flex flex-col items-center text-center gap-4">
+                  <div className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold ${step.color}`}>
+                    {step.number}
+                  </div>
+                  <h3 className="text-lg font-semibold">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">{step.description}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-16">
+              <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Link href="/signup">Try it now — free forever plan</Link>
+              </Button>
+            </div>
+          </div>
         </section>
       </main>
       <Footer />
