@@ -343,7 +343,7 @@ export default function Home() {
         
         <SeeItInAction />
 
-        <section className="w-full py-12 md:py-20 lg:py-24 bg-indigo-600 text-white">
+        <section className="w-full py-8 md:py-14 lg:py-16 bg-indigo-600 text-white">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-6 text-center">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to turn feedback into marketing?</h2>
