@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, TrendingUp, Sparkles, Pencil, Share2, Eye, Search, Play } from "lucide-react"
+import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, TrendingUp, Sparkles, Pencil, Share2, Eye, Search, Play, Globe, MoreHorizontal } from "lucide-react"
 import Link from "next/link"
 
 const recentProjects = [
