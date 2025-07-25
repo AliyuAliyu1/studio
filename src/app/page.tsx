@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UploadCloud, Bot, FileText, Sparkles, Share, Play } from 'lucide-react';
 import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function Logo() {
   return (
@@ -28,7 +29,7 @@ function Header() {
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="/pricing">
           Pricing
         </Link>
-         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+         <Link className="text-sm font-medium hover:underline underline-offset-4" href="/contact">
           Contact
         </Link>
       </nav>
@@ -55,7 +56,7 @@ function Footer() {
         <Link className="text-xs hover:underline underline-offset-4" href="#">
           Privacy Policy
         </Link>
-        <Link className="text-xs hover:underline underline-offset-4" href="#">
+        <Link className="text-xs hover:underline underline-offset-4" href="/contact">
           Contact
         </Link>
       </nav>
@@ -137,6 +138,77 @@ function BrainIcon(props: React.SVGProps<SVGSVGElement>) {
         <path d="M18.5 22a2.5 2.5 0 0 1-2.5-2.5v-1a2.5 2.5 0 0 1 2.5-2.5v0a2.5 2.5 0 0 1 2.5 2.5v1a2.5 2.5 0 0 1-2.5 2.5Z" />
         <path d="M5.5 22a2.5 2.5 0 0 0 2.5-2.5v-1a2.5 2.5 0 0 0-2.5-2.5v0A2.5 2.5 0 0 0 3 19.5v1a2.5 2.5 0 0 0 2.5 2.5Z" />
       </svg>
+    )
+}
+
+function SeeItInAction() {
+    function FeedbackDashboardIcon() {
+        return (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22Z" stroke="#4338CA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+        )
+    }
+
+    return (
+        <section className="w-full py-12 md:py-24 lg:py-32">
+            <div className="container px-4 md:px-6">
+                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                    <Button asChild size="sm" variant="outline" className="rounded-full">
+                        <Link href="/signup">Try it now — free forever plan</Link>
+                    </Button>
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">See it in Action</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        Real screenshots from the working app
+                    </p>
+                </div>
+                
+                <Tabs defaultValue="feedback_view" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
+                        <TabsTrigger value="feedback_view">Feedback View</TabsTrigger>
+                        <TabsTrigger value="content_generator">Content Generator</TabsTrigger>
+                        <TabsTrigger value="brand_settings">Brand Settings</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="feedback_view">
+                        <Card className="mt-8">
+                            <CardContent className="p-6">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <FeedbackDashboardIcon />
+                                    <h3 className="text-xl font-semibold">Feedback Dashboard</h3>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-semibold">Positive Feedback</h4>
+                                                <p className="text-muted-foreground text-sm">Your new checkout process is so smooth and fast!</p>
+                                            </div>
+                                        </div>
+                                         <div className="flex items-start gap-3">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-semibold">Feature Request</h4>
+                                                <p className="text-muted-foreground text-sm">Would love to see a dark mode option in the app</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-4">
+                                        <h4 className="font-semibold mb-3">AI Analysis</h4>
+                                        <ul className="space-y-2 text-sm text-gray-700 list-disc list-inside">
+                                            <li>85% positive sentiment</li>
+                                            <li>Key themes: checkout, speed, UI</li>
+                                            <li>12 mentions of dark mode</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
+
+            </div>
+        </section>
     )
 }
 
@@ -268,6 +340,26 @@ export default function Home() {
             </div>
           </div>
         </section>
+        
+        <SeeItInAction />
+
+        <section className="w-full py-20 md:py-32 lg:py-40 bg-indigo-600 text-white">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-6 text-center">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to turn feedback into marketing?</h2>
+                    <p className="max-w-[600px] text-indigo-200 md:text-xl">
+                        Join thousands of teams who trust their customer insights to FeedbackAI
+                    </p>
+                    <div className="flex items-center gap-4 text-sm font-medium">
+                        <Sparkles className="h-4 w-4" />
+                        <span>Start Free</span>
+                        <div className="w-px h-4 bg-indigo-400"></div>
+                        <span>No Credit Card Required</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
       </main>
       <Footer />
     </div>
