@@ -19,9 +19,9 @@ function Logo() {
 
 function Header() {
   return (
-    <header className="px-4 lg:px-6 h-16 flex items-center bg-background">
+    <header className="px-4 lg:px-6 h-16 flex items-center justify-between bg-background">
       <Logo />
-      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+      <nav className="hidden lg:flex gap-6">
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
           How It Works
         </Link>
@@ -31,13 +31,15 @@ function Header() {
          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
           Contact
         </Link>
+      </nav>
+      <div className="flex items-center gap-2">
         <Button asChild variant="ghost">
           <Link href="/login">Sign In</Link>
         </Button>
         <Button asChild>
           <Link href="/signup">Try Free</Link>
         </Button>
-      </nav>
+      </div>
     </header>
   );
 }
@@ -146,7 +148,7 @@ export default function Home() {
                 <div className="flex flex-col justify-center space-y-4">
                     <div className="space-y-4">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
-                        Turn Customer Feedback into Branded Content<span className="text-indigo-600">Instantly</span>
+                        Turn Customer Feedback into Branded Content<span className="text-indigo-600">. Instantly.</span>
                         </h1>
                         <p className="max-w-[600px] text-muted-foreground md:text-xl">
                         This AI-powered assistant helps your team act faster on what customers actually say.
