@@ -51,30 +51,6 @@ const benefits = [
     'Basic analytics dashboard',
 ]
 
-const testimonials = [
-    {
-        name: 'Sarah Chen',
-        title: 'Marketing Director',
-        avatar: 'https://placehold.co/40x40.png',
-        dataAiHint: 'woman portrait',
-        text: 'FeedbackAI turned our customer reviews into our best-performing blog content. Setup took 5 minutes!',
-    },
-    {
-        name: 'Mike Rodriguez',
-        title: 'Product Manager',
-        avatar: 'https://placehold.co/40x40.png',
-        dataAiHint: 'man portrait',
-        text: 'The AI insights revealed patterns in our feedback we never noticed. Game-changer for our team.',
-    }
-]
-
-const securityFeatures = [
-    { icon: <ShieldCheck className="h-5 w-5" />, text: 'SOC 2 Type II certified' },
-    { icon: <Lock className="h-5 w-5" />, text: '256-bit SSL encryption' },
-    { icon: <ShieldCheck className="h-5 w-5" />, text: 'GDPR & CCPA compliant' },
-]
-
-
 export default function SignupPageV2() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
@@ -156,51 +132,6 @@ export default function SignupPageV2() {
                                         <li key={benefit} className="flex items-start gap-3">
                                             <Check className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
                                             <span className="text-muted-foreground">{benefit}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader className="flex-row items-center gap-3">
-                                <div className="p-2 bg-purple-100 rounded-full">
-                                    <Users2 className="h-6 w-6 text-purple-600" />
-                                </div>
-                                <CardTitle className="font-headline text-lg">Trusted by 10,000+ Teams</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                               {testimonials.map(testimonial => (
-                                 <figure key={testimonial.name}>
-                                   <blockquote className="text-muted-foreground">"{testimonial.text}"</blockquote>
-                                   <figcaption className="flex items-center gap-3 mt-4">
-                                     <Avatar>
-                                       <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint={testimonial.dataAiHint} />
-                                       <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                                     </Avatar>
-                                     <div>
-                                        <div className="font-semibold">{testimonial.name}</div>
-                                        <div className="text-sm text-muted-foreground">{testimonial.title}</div>
-                                     </div>
-                                   </figcaption>
-                                 </figure>
-                               ))}
-                            </CardContent>
-                        </Card>
-
-                         <Card className="bg-green-50/50 border-green-100">
-                             <CardHeader className="flex-row items-center gap-3">
-                                <div className="p-2 bg-green-100 rounded-full">
-                                    <ShieldCheck className="h-6 w-6 text-green-600" />
-                                </div>
-                                <CardTitle className="font-headline text-lg">Enterprise-Grade Security</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-3">
-                                    {securityFeatures.map(feature => (
-                                        <li key={feature.text} className="flex items-start gap-3">
-                                            {React.cloneElement(feature.icon, { className: "h-5 w-5 text-green-500 mt-0.5 shrink-0" })}
-                                            <span className="text-muted-foreground">{feature.text}</span>
                                         </li>
                                     ))}
                                 </ul>
