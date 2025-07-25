@@ -85,8 +85,8 @@ export default function SignupPageV2() {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-12 gap-12">
-                    <div className="lg:col-span-6">
+                <div className="grid lg:grid-cols-1 gap-12 justify-center">
+                    <div className="lg:col-span-1 max-w-lg w-full mx-auto">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Create Your Account</CardTitle>
@@ -118,26 +118,6 @@ export default function SignupPageV2() {
                         </Card>
                     </div>
 
-                    <div className="lg:col-span-6 space-y-8">
-                        <Card className="bg-blue-50/50 border-blue-100">
-                            <CardHeader className="flex-row items-center gap-3">
-                                <div className="p-2 bg-blue-100 rounded-full">
-                                    <Sparkles className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <CardTitle className="font-headline text-lg">What You Get With Your Free Account</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-3">
-                                    {benefits.map(benefit => (
-                                        <li key={benefit} className="flex items-start gap-3">
-                                            <Check className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                                            <span className="text-muted-foreground">{benefit}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    </div>
                 </div>
             </div>
         </main>
