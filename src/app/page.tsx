@@ -223,23 +223,26 @@ export default function Home() {
         </section>
 
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50/50">
-            <div className="container px-4 md:px-6">
-                <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
-                   {features.map((feature, index) => (
-                    <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white rounded-xl">
-                        <CardHeader className="flex flex-col items-start p-6">
-                             <div className={`p-3 rounded-lg mb-4 ${feature.bgColor}`}>
-                                {feature.icon}
-                            </div>
-                            <CardTitle className="text-base font-bold text-left">{feature.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-muted-foreground text-left p-6 pt-0">
-                            <p className="text-sm">{feature.description}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-                </div>
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What You Can Do in One Click</h2>
             </div>
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
+                {features.map((feature, index) => (
+                <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white rounded-xl">
+                    <CardHeader className="flex flex-col items-start p-6">
+                            <div className={`p-3 rounded-lg mb-4 ${feature.bgColor}`}>
+                            {feature.icon}
+                        </div>
+                        <CardTitle className="text-base font-bold text-left">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-muted-foreground text-left p-6 pt-0">
+                        <p className="text-sm">{feature.description}</p>
+                    </CardContent>
+                </Card>
+            ))}
+            </div>
+          </div>
         </section>
 
         <section id="how-it-works" className="w-full py-12 md:py-24 lg:py-32">
