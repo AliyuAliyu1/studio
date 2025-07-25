@@ -20,7 +20,7 @@ function Header() {
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
           How it Works
         </Link>
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/pricing">
           Pricing
         </Link>
         <Button asChild variant="outline">
