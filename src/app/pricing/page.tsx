@@ -14,22 +14,27 @@ function Logo() {
 
 function Header() {
   return (
-    <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm bg-card">
+    <header className="px-4 lg:px-6 h-16 flex items-center justify-between bg-card shadow-sm">
       <Logo />
-      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/#features">
+      <nav className="hidden lg:flex gap-6 absolute left-1/2 -translate-x-1/2">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/#how-it-works">
           How it Works
         </Link>
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="/pricing">
           Pricing
         </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/contact">
+          Contact
+        </Link>
+      </nav>
+      <div className="flex items-center gap-2">
         <Button asChild variant="outline">
           <Link href="/login">Sign In</Link>
         </Button>
          <Button asChild>
           <Link href="/signup">Sign Up</Link>
         </Button>
-      </nav>
+      </div>
     </header>
   );
 }
@@ -45,7 +50,7 @@ function Footer() {
         <Link className="text-xs hover:underline underline-offset-4" href="#">
           Privacy Policy
         </Link>
-        <Link className="text-xs hover:underline underline-offset-4" href="#">
+        <Link className="text-xs hover:underline underline-offset-4" href="/contact">
           Contact
         </Link>
       </nav>
