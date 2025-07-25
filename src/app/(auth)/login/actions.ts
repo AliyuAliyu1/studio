@@ -10,29 +10,16 @@ import { initFirebaseAdminApp } from "@/lib/firebase-admin";
 export async function login(data: { email: string; password: string }) {
   try {
     // This is a mock implementation to allow access.
-    // A real implementation would involve validating credentials against Firebase Auth.
-    // Since we can't easily validate passwords with the Admin SDK without custom tokens,
-    // we'll just check if a user with that email exists.
-    const app = initFirebaseAdminApp();
-    const auth = getAuth(app);
-
-    // This check is just to simulate a lookup.
-    await auth.getUserByEmail(data.email);
-
-    if (data.password.length < 6) {
-        return { error: 'Password must be at least 6 characters.' };
+    // No validation is performed, any email/password combination will work.
+    
+    if (data.password.length < 1) {
+        return { error: 'Password cannot be empty.' };
     }
     
     // In a real flow, you'd create a session cookie here.
     // For this demo, we just return success.
     return { success: true };
   } catch (error: any) {
-    if (error.code === 'auth/user-not-found') {
-       return { error: 'No user found with this email.' };
-    }
-    if (error.code === 'auth/invalid-credential') {
-      return { error: 'Invalid credentials. Please try again.' };
-    }
     // For other Firebase errors or general errors
     return { error: 'An unexpected error occurred during login.' };
   }
