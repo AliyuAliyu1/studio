@@ -93,8 +93,8 @@ export default function DashboardLayout({
             </Sheet>
         </div>
       </header>
-       <main className="flex-1">
-        <div className="container py-8 md:py-10">
+       <main className="flex-1 p-8">
+        <div className="container">
             {children}
         </div>
       </main>
