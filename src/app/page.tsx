@@ -343,11 +343,11 @@ export default function Home() {
         
         <SeeItInAction />
 
-        <section className="w-full py-8 md:py-14 lg:py-16 bg-indigo-600 text-white">
+        <section className="w-full py-6 md:py-10 lg:py-12 bg-indigo-600 text-white">
             <div className="container px-4 md:px-6">
-                <div className="flex flex-col items-center justify-center space-y-6 text-center">
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Ready to turn feedback into marketing?</h2>
-                    <p className="max-w-[600px] text-indigo-200 md:text-xl">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Ready to turn feedback into marketing?</h2>
+                    <p className="max-w-[600px] text-indigo-200 md:text-lg">
                         Join thousands of teams who trust their customer insights to FeedbackAI
                     </p>
                     <div className="flex items-center gap-4 text-sm font-medium">
