@@ -7,7 +7,11 @@ import Image from 'next/image';
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2">
-      <Sparkles className="h-6 w-6 text-primary" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="24" height="24" rx="6" fill="#4338CA"/>
+        <path d="M12.4375 7.5H15.625L11.25 16.5H8.0625L12.4375 7.5Z" fill="white"/>
+        <path d="M11.9375 12H9.6875L8.5625 14H6.3125L9.9375 7.5H12.1875L13.125 9.125L11.9375 12Z" fill="#A5B4FC"/>
+      </svg>
       <span className="font-bold text-lg">FeedbackAI</span>
     </Link>
   );
@@ -57,25 +61,76 @@ function Footer() {
   );
 }
 
+function HeroImage() {
+    return (
+        <Card className="shadow-lg p-4 rounded-xl border-gray-200">
+            <CardHeader className="pb-2">
+                <p className="text-sm text-gray-500">What your team sees inside</p>
+            </CardHeader>
+            <CardContent>
+                <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="flex gap-1.5">
+                            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mb-6">
+                        <Sparkles className="w-5 h-5 text-indigo-600" />
+                        <h3 className="font-semibold text-gray-800">Customer Feedback Dashboard</h3>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 className="font-medium text-sm text-gray-600 mb-3">Recent Feedback</h4>
+                        <ul className="space-y-2 text-sm">
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                <p className="text-gray-700">Love the new checkout process!</p>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                <p className="text-gray-700">Great customer support experience</p>
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                <p className="text-gray-700">Website is much faster now</p>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div className="mt-6">
+                        <Button variant="ghost" className="w-full justify-center gap-2 text-indigo-600 hover:text-indigo-700">
+                            <Sparkles className="w-4 h-4" />
+                            Generate Content from Feedback
+                        </Button>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 export default function Home() {
   const features = [
     {
-      icon: <UploadCloud className="h-8 w-8 text-primary" />,
+      icon: <UploadCloud className="h-8 w-8 text-indigo-600" />,
       title: 'Upload Customer Feedback',
       description: 'Import feedback from surveys, reviews, or support tickets.',
     },
     {
-      icon: <Bot className="h-8 w-8 text-primary" />,
+      icon: <Bot className="h-8 w-8 text-indigo-600" />,
       title: 'Let AI Analyze and Summarize It',
       description: 'AI identifies key themes and sentiment automatically.',
     },
     {
-      icon: <FileText className="h-8 w-8 text-primary" />,
+      icon: <FileText className="h-8 w-8 text-indigo-600" />,
       title: 'Generate Blog Posts, Tweets, or Microsites',
       description: 'Create content that resonates with your audience.',
     },
     {
-        icon: <Share className="h-8 w-8 text-primary" />,
+        icon: <Share className="h-8 w-8 text-indigo-600" />,
         title: 'Export, Edit, or Publish with Your Branding',
         description: 'Maintain brand consistency across all content.',
       },
@@ -87,35 +142,28 @@ export default function Home() {
       <main className="flex-1">
         <section className="w-full py-20 md:py-32 lg:py-40">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-24 items-center">
+            <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-24 items-center">
                 <div className="flex flex-col justify-center space-y-4">
                     <div className="space-y-4">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
-                        Turn Customer Feedback into Branded Content<span className="text-primary">Instantly</span>
+                        Turn Customer Feedback into Branded Content<span className="text-indigo-600">Instantly</span>
                         </h1>
                         <p className="max-w-[600px] text-muted-foreground md:text-xl">
                         This AI-powered assistant helps your team act faster on what customers actually say.
                         </p>
                     </div>
                     <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                        <Button asChild size="lg">
+                        <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white">
                             <Link href="/signup"><Play className="mr-2 h-5 w-5 fill-current" /> Try it Free</Link>
                         </Button>
                     </div>
                 </div>
-                <Image
-                    src="https://placehold.co/600x450.png"
-                    width="600"
-                    height="450"
-                    alt="Hero"
-                    data-ai-hint="dashboard preview"
-                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-                />
+                <HeroImage />
             </div>
           </div>
         </section>
 
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-white">
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50/50">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <div className="space-y-2">
@@ -124,15 +172,15 @@ export default function Home() {
                 </div>
                 <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
                    {features.map((feature, index) => (
-                    <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-                        <CardHeader className="flex flex-col items-start p-6">
-                            <div className="bg-primary/10 p-3 rounded-md mb-4">
+                    <Card key={index} className="h-full transform transition-transform duration-300 hover:scale-105 hover:shadow-xl bg-white">
+                        <CardHeader className="flex flex-col items-center p-6 text-center">
+                             <div className="bg-indigo-100 p-4 rounded-lg mb-4">
                                 {feature.icon}
                             </div>
-                            <CardTitle className="text-xl font-bold">{feature.title}</CardTitle>
+                            <CardTitle className="text-lg font-bold">{feature.title}</CardTitle>
                         </CardHeader>
-                        <CardContent className="text-muted-foreground p-6 pt-0">
-                            <p>{feature.description}</p>
+                        <CardContent className="text-muted-foreground text-center p-6 pt-0">
+                            <p className="text-sm">{feature.description}</p>
                         </CardContent>
                     </Card>
                 ))}
