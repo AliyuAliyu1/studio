@@ -45,7 +45,7 @@ const recentProjects = [
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
         <div>
             <h1 className="text-3xl font-bold font-headline">Welcome back, John</h1>
             <p className="text-muted-foreground">Ready to transform customer feedback into compelling content?</p>
@@ -54,31 +54,31 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
                 <Card className="h-full">
-                    <CardHeader className="text-center">
-                        <div className="mx-auto bg-primary/10 rounded-full p-3 w-fit mb-2">
+                    <CardHeader className="text-center p-8">
+                        <div className="mx-auto bg-primary/10 rounded-full p-3 w-fit mb-4">
                             <Upload className="h-8 w-8 text-primary" />
                         </div>
                         <CardTitle className="font-headline text-2xl">Upload New Feedback</CardTitle>
                         <CardDescription>Start by uploading customer feedback from surveys, reviews, or support tickets</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 px-8 pb-8">
                         <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 bg-primary/5">
                             <div className="flex justify-center gap-4 mb-2">
-                                <Button><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
-                                <Button variant="outline"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
+                                <Button className="bg-indigo-600 hover:bg-indigo-700"><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
+                                <Button variant="outline" className="bg-white"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
                             </div>
                             <p className="text-center text-xs text-muted-foreground">Supports CSV, Excel, JSON, or plain text files</p>
                         </div>
                         <div className="grid grid-cols-3 gap-4">
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
                                 <MessageSquare />
                                 <span>Survey Data</span>
                             </Button>
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
                                 <Star />
                                 <span>Reviews</span>
                             </Button>
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2">
+                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
                                 <LifeBuoy />
                                 <span>Support Tickets</span>
                             </Button>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                       <div className="space-y-2 text-sm">
+                       <div className="space-y-2 text-sm pt-2">
                            <div className="flex justify-between">
                                <span>Total Feedback</span>
                                <span className="font-medium">1,247</span>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
                            </div>
                            <div className="flex justify-between items-center">
                                <span>This Month</span>
-                               <Badge className="bg-green-100 text-green-700 hover:bg-green-200">+23%</Badge>
+                               <Badge className="bg-green-100 text-green-700 hover:bg-green-200 font-medium">+23%</Badge>
                            </div>
                        </div>
                     </CardContent>
@@ -125,15 +125,15 @@ export default function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                       <div className="space-y-2">
-                           <Button asChild variant="ghost" className="w-full justify-start">
-                               <Link href="/dashboard/generate"><FileText /> Generate Blog Post</Link>
+                       <div className="space-y-1 pt-2">
+                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
+                               <Link href="/dashboard/generate"><FileText className="h-4 w-4" /> Generate Blog Post</Link>
                            </Button>
-                           <Button asChild variant="ghost" className="w-full justify-start">
-                               <Link href="/dashboard/generate"><Share2 /> Create Social Media</Link>
+                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
+                               <Link href="/dashboard/generate"><Share2 className="h-4 w-4" /> Create Social Media</Link>
                            </Button>
-                           <Button asChild variant="ghost" className="w-full justify-start">
-                               <Link href="/dashboard/generate"><Globe /> Build Microsite</Link>
+                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
+                               <Link href="/dashboard/generate"><Globe className="h-4 w-4" /> Build Microsite</Link>
                            </Button>
                        </div>
                     </CardContent>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="flex gap-2">
-                <Button variant="outline">View Analysis</Button>
+                <Button variant="outline" className="bg-white">View Analysis</Button>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white"><Play className="mr-2 h-4 w-4 fill-current"/> Start Creating</Button>
             </div>
         </div>

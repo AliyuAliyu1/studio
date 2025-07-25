@@ -3,14 +3,7 @@
 import Link from 'next/link';
 import {
   Bell,
-  Bot,
-  FileText,
-  Home,
   Menu,
-  Search,
-  Settings,
-  Briefcase,
-  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,15 +11,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
 
@@ -58,22 +42,28 @@ export default function DashboardLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-            <Logo />
-            <div className="flex-1 flex justify-center">
-              <nav className="hidden md:flex md:gap-8 text-sm font-medium">
-                {navLinks.map(link => (
-                    <Link href={link.href} key={link.href} className={`transition-colors hover:text-foreground ${pathname === link.href ? 'text-foreground' : 'text-muted-foreground'}`}>{link.label}</Link>
-                ))}
-              </nav>
+    <div className="flex flex-col min-h-screen bg-gray-50/50">
+      <header className="sticky top-0 z-40 w-full border-b bg-background">
+        <div className="container flex h-16 items-center">
+            <div className="mr-auto">
+              <Logo />
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-5 w-5" />
+            
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+              {navLinks.map(link => (
+                  <Link href={link.href} key={link.href} className={`transition-colors hover:text-primary ${pathname === link.href ? 'text-primary' : 'text-muted-foreground'}`}>{link.label}</Link>
+              ))}
+            </nav>
+            
+            <div className="flex items-center gap-4 ml-auto">
+              <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                <Bell className="h-4 w-4" />
                 <span className="sr-only">Toggle notifications</span>
               </Button>
+              <Avatar className="h-8 w-8">
+                  <AvatarImage src="https://placehold.co/32x32.png" alt="@shadcn" />
+                  <AvatarFallback>JD</AvatarFallback>
+              </Avatar>
             </div>
              <Sheet>
               <SheetTrigger asChild>
@@ -104,7 +94,7 @@ export default function DashboardLayout({
         </div>
       </header>
        <main className="flex-1">
-        <div className="container py-8 md:py-12">
+        <div className="container py-8 md:py-10">
             {children}
         </div>
       </main>
