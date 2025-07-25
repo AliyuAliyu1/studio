@@ -19,9 +19,9 @@ import Link from "next/link"
 
 const mockContent = [
     { id: 'c_1', title: "Our New Feature is a Game-Changer", type: 'blog_post', status: 'Published', date: '2024-05-21' },
-    { id: 'c_2', "Loving the new speed improvements!", type: 'social_media_post', status: 'Draft', date: '2024-05-20' },
-    { id: 'c_3', "Bug Fixes and Performance Updates", type: 'microsite', status: 'Published', date: '2024-05-19' },
-    { id: 'c_4', "Why Our Support Team Rocks", type: 'blog_post', status: 'Draft', date: '2024-05-18' },
+    { id: 'c_2', title: "Loving the new speed improvements!", type: 'social_media_post', status: 'Draft', date: '2024-05-20' },
+    { id: 'c_3', title: "Bug Fixes and Performance Updates", type: 'microsite', status: 'Published', date: '2024-05-19' },
+    { id: 'c_4', title: "Why Our Support Team Rocks", type: 'blog_post', status: 'Draft', date: '2024-05-18' },
 ];
 
 export default function ContentPage() {
