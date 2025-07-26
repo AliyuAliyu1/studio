@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRouter } from 'next/navigation';
 
 function Logo() {
   return (
@@ -28,9 +30,9 @@ function Logo() {
 }
 
 const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/projects", label: "Projects" },
-  { href: "/dashboard/settings", label: "Settings" },
+    { href: "/dashboard", label: "Dashboard", value: "dashboard" },
+    { href: "/dashboard/projects", label: "Projects", value: "projects" },
+    { href: "/dashboard/settings", label: "Settings", value: "settings" },
 ];
 
 
@@ -40,19 +42,37 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const getCurrentTab = () => {
+    if (pathname.startsWith('/dashboard/projects')) return 'projects';
+    if (pathname.startsWith('/dashboard/settings')) return 'settings';
+    return 'dashboard';
+  }
+
+  const handleTabChange = (value: string) => {
+    const link = navLinks.find(link => link.value === value);
+    if(link) {
+        router.push(link.href);
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50/50">
       <header className="sticky top-0 z-40 w-full border-b bg-background">
         <div className="container flex h-16 items-center">
-            <div className="mr-auto">
+            <div className="mr-auto hidden md:block">
               <Logo />
             </div>
             
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navLinks.map(link => (
-                  <Link href={link.href} key={link.href} className={`transition-colors hover:text-primary ${pathname === link.href ? 'text-primary' : 'text-muted-foreground'}`}>{link.label}</Link>
-              ))}
+             <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
+                <TabsList>
+                    <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                    <TabsTrigger value="projects">Projects</TabsTrigger>
+                    <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+             </Tabs>
             </nav>
             
             <div className="flex items-center gap-4 ml-auto">
@@ -93,7 +113,7 @@ export default function DashboardLayout({
             </Sheet>
         </div>
       </header>
-       <main className="flex-1 p-8">
+       <main className="flex-1 p-4 sm:p-6 md:p-8">
         <div className="container">
             {children}
         </div>
