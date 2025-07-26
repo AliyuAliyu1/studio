@@ -4,7 +4,7 @@
 import { generateContent } from "@/ai/flows/generate-content";
 import type { Project } from "@/lib/projects-store";
 
-export async function refineProjectContent(project: Project, newFeedback: string): Promise<{ content?: string; error?: string }> {
+export async function refineProjectContent(project: Project, newFeedback: string): Promise<{ title?: string, content?: string; error?: string }> {
     try {
         // In a real app, brandColor and logo would come from user settings in DB
         const brandColor = "#3F51B5"
@@ -18,7 +18,7 @@ export async function refineProjectContent(project: Project, newFeedback: string
             previousContent: project.content,
         });
 
-        return { content: result.content };
+        return { title: result.title, content: result.content };
     } catch(error) {
         console.error("Error refining content:", error);
         return { error: "Failed to refine content due to a server error." };

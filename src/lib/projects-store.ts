@@ -16,9 +16,11 @@ export interface Project {
 
 interface ProjectsState {
   projects: Project[];
+  currentProjectId: string | null;
   addProject: (project: Project) => void;
   deleteProject: (id: string) => void;
   updateProject: (id: string, updates: Partial<Project>) => void;
+  setCurrentProjectId: (id: string | null) => void;
 }
 
 export const useProjectsStore = create<ProjectsState>()(
@@ -44,6 +46,7 @@ export const useProjectsStore = create<ProjectsState>()(
           contentType: 'microsite',
         },
       ],
+      currentProjectId: null,
       addProject: (project) =>
         set((state) => ({ projects: [project, ...state.projects] })),
       deleteProject: (id) =>
@@ -56,6 +59,7 @@ export const useProjectsStore = create<ProjectsState>()(
                 p.id === id ? { ...p, ...updates, lastUpdated: new Date().toISOString().split('T')[0] } : p
             ),
         })),
+      setCurrentProjectId: (id) => set({ currentProjectId: id }),
     }),
     {
       name: 'projects-storage',

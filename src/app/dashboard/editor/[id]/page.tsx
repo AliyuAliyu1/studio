@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Button } from "@/components/ui/button"
@@ -24,12 +25,13 @@ import { refineProjectContent } from "./actions";
 export default function EditorPage() {
   const router = useRouter();
   const params = useParams();
-  const { projects, updateProject } = useProjectsStore();
+  const { projects, updateProject, setCurrentProjectId } = useProjectsStore();
   const [project, setProject] = useState<Project | null>(null);
   const [newFeedback, setNewFeedback] = useState("");
   const [isRefining, setIsRefining] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [editedContent, setEditedContent] = useState("");
 
   useEffect(() => {
     const projectId = params.id as string;
@@ -37,12 +39,17 @@ export default function EditorPage() {
       const foundProject = projects.find(p => p.id === projectId);
       if (foundProject) {
         setProject(foundProject);
+        setEditedContent(foundProject.content);
+        setCurrentProjectId(projectId);
       } else {
-        // Handle project not found, maybe redirect or show an error
         router.push('/dashboard/projects');
       }
     }
-  }, [params.id, projects, router]);
+    // Cleanup when leaving the page
+    return () => {
+        setCurrentProjectId(null);
+    }
+  }, [params.id, projects, router, setCurrentProjectId]);
 
   const handleRefineContent = async () => {
     if (!project || !newFeedback) {
@@ -59,12 +66,11 @@ export default function EditorPage() {
         if (result.error) {
             throw new Error(result.error);
         }
-        if(result.content) {
-            const updatedContent = result.content;
-            // Update the project in the zustand store
-            updateProject(project.id, { content: updatedContent });
-            // Manually update the local project state to trigger re-render of textarea
-            setProject(prev => prev ? { ...prev, content: updatedContent } : null);
+        if(result.content && result.title) {
+            const updatedProjectData = { content: result.content, title: result.title };
+            updateProject(project.id, updatedProjectData);
+            setProject(prev => prev ? { ...prev, ...updatedProjectData } : null);
+            setEditedContent(result.content); // Update the textarea content
         }
         toast({
             title: "Content Refined!",
@@ -146,8 +152,8 @@ export default function EditorPage() {
             </CardHeader>
             <CardContent>
                 <Textarea 
-                    key={project.id + project.content} // Re-render when content or project ID changes
-                    defaultValue={project.content}
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
                     className="min-h-[60vh] text-base"
                 />
             </CardContent>
