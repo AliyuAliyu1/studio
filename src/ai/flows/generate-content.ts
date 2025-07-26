@@ -63,14 +63,14 @@ const prompt = ai.definePrompt({
 
   {{#if (eq contentType "microsite")}}
   Generate a beautiful, modern, and slick single-page HTML microsite.
-  - The page should be fully self-contained HTML.
+  - The page should be fully self-contained HTML, wrapped in a single \`<div>\` tag. Do not include \`<html>\` or \`<body>\` tags.
   - Use TailwindCSS for styling. You can use any modern design elements like gradients, drop shadows, etc.
   - Use placeholder images from https://placehold.co where appropriate (e.g., https://placehold.co/600x400.png). Add a 'data-ai-hint' attribute to the image tags with one or two keywords for the image.
   - Incorporate ShadCN UI components by using their HTML structure and classes. For example, for a button, use '<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Click me</button>'.
   - Use icons from 'lucide-react' by providing inline SVG for them.
   - Add subtle animations and transitions using 'tailwindcss-animate' classes like 'animate-in', 'fade-in', 'slide-in-from-bottom'.
   - The content of the microsite should be based on the customer feedback provided.
-  - The output should be ONLY the HTML content for the microsite.
+  - The output should be ONLY the HTML content for the microsite, wrapped in a single div.
   {{else if (eq contentType "blog_post")}}
   Generate a new blog post based on the customer feedback.
   Your final output should be only the new, refined content, prefixed with the generated title.
