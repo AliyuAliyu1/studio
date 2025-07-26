@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,9 @@ import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, Trendi
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label";
 
 const recentProjects = [
     {
@@ -51,6 +55,7 @@ export default function DashboardPage() {
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [feedback, setFeedback] = useState('');
+    const [pastedFeedback, setPastedFeedback] = useState('');
   
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -106,7 +111,39 @@ export default function DashboardPage() {
                         />
                             <div className="flex justify-center gap-4 mb-2">
                                 <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
-                                <Button variant="outline" className="bg-white"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="bg-white"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                        <DialogTitle>Paste Feedback</DialogTitle>
+                                        <DialogDescription>
+                                            Paste your customer feedback text below.
+                                        </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <Label htmlFor="feedback-text" className="sr-only">
+                                                Feedback
+                                            </Label>
+                                            <Textarea
+                                                id="feedback-text"
+                                                placeholder="Paste your feedback here..."
+                                                className="min-h-[200px]"
+                                                value={pastedFeedback}
+                                                onChange={(e) => setPastedFeedback(e.target.value)}
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button type="button" onClick={() => {
+                                                    setFeedback(pastedFeedback);
+                                                    setPastedFeedback('');
+                                                }}>Save feedback</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                             <p className="text-center text-xs text-muted-foreground">Supports CSV, Excel, JSON, or plain text files</p>
                         </div>
@@ -229,3 +266,5 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+    
