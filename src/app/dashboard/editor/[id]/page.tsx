@@ -10,18 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Download, Share2, ArrowLeft } from "lucide-react"
+import { Download, Share2, ArrowLeft, RefreshCw, Sparkles, Loader2 } from "lucide-react"
 import { useProjectsStore } from "@/lib/projects-store";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/projects-store";
 import Link from "next/link";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { refineProjectContent } from "./actions";
 
 export default function EditorPage() {
   const router = useRouter();
   const params = useParams();
-  const { projects } = useProjectsStore();
+  const { projects, updateProject } = useProjectsStore();
   const [project, setProject] = useState<Project | null>(null);
+  const [newFeedback, setNewFeedback] = useState("");
+  const [isRefining, setIsRefining] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const projectId = params.id as string;
@@ -35,6 +42,39 @@ export default function EditorPage() {
       }
     }
   }, [params.id, projects, router]);
+
+  const handleRefineContent = async () => {
+    if (!project || !newFeedback) {
+        toast({
+            title: "Missing Information",
+            description: "Please provide new feedback to refine the content.",
+            variant: "destructive"
+        })
+        return;
+    }
+    setIsRefining(true);
+    try {
+        const result = await refineProjectContent(project, newFeedback);
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        updateProject(project.id, { content: result.content });
+        toast({
+            title: "Content Refined!",
+            description: "The project has been updated with the refined content.",
+        });
+        setNewFeedback("");
+    } catch (error) {
+        toast({
+            title: "Refinement Failed",
+            description: error instanceof Error ? error.message : "An unknown error occurred.",
+            variant: "destructive",
+        })
+    } finally {
+        setIsRefining(false);
+    }
+  }
+
 
   if (!project) {
     return <div>Loading...</div>; // Or a more sophisticated loading state
@@ -53,6 +93,40 @@ export default function EditorPage() {
                 <h1 className="text-2xl font-bold font-headline">{project.title}</h1>
             </div>
             <div className="flex gap-2">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4"/> Refine with New Feedback</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Refine Content</DialogTitle>
+                            <DialogDescription>
+                                Provide new customer feedback to refine the existing content. The AI will use this feedback to improve the current version.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <Label htmlFor="new-feedback" className="sr-only">New Feedback</Label>
+                            <Textarea 
+                                id="new-feedback"
+                                placeholder="Paste new customer feedback here..."
+                                className="min-h-[150px]"
+                                value={newFeedback}
+                                onChange={(e) => setNewFeedback(e.target.value)}
+                            />
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="ghost">Cancel</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                                <Button onClick={handleRefineContent} disabled={isRefining}>
+                                    {isRefining ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4" />}
+                                    Refine Content
+                                </Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
                 <Button variant="outline"><Download className="mr-2 h-4 w-4"/> Export as HTML</Button>
                 <Button><Share2 className="mr-2 h-4 w-4" /> Publish</Button>
             </div>
@@ -66,6 +140,7 @@ export default function EditorPage() {
             </CardHeader>
             <CardContent>
                 <Textarea 
+                    key={project.content} // Re-render when content changes
                     defaultValue={project.content}
                     className="min-h-[60vh] text-base"
                 />

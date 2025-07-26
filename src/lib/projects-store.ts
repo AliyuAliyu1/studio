@@ -18,6 +18,7 @@ interface ProjectsState {
   projects: Project[];
   addProject: (project: Project) => void;
   deleteProject: (id: string) => void;
+  updateProject: (id: string, updates: Partial<Project>) => void;
 }
 
 export const useProjectsStore = create<ProjectsState>()(
@@ -48,6 +49,12 @@ export const useProjectsStore = create<ProjectsState>()(
       deleteProject: (id) =>
         set((state) => ({
           projects: state.projects.filter((project) => project.id !== id),
+        })),
+      updateProject: (id, updates) =>
+        set((state) => ({
+            projects: state.projects.map((p) =>
+                p.id === id ? { ...p, ...updates, lastUpdated: new Date().toISOString().split('T')[0] } : p
+            ),
         })),
     }),
     {
