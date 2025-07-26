@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -16,6 +17,7 @@ import { Loader2, Sparkles, ThumbsUp, ThumbsDown, Meh, ArrowLeft } from "lucide-
 import type { AnalyzeFeedbackOutput, GenerateContentOutput } from "./actions"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { useProjectsStore } from "@/lib/projects-store";
 
 const formSchema = z.object({
   feedback: z.string().min(20, { message: "Feedback must be at least 20 characters." }),
@@ -85,6 +87,7 @@ export default function GeneratePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<{ analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null }>({ analysis: null, content: null });
   const { toast } = useToast()
+  const { addProject } = useProjectsStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -115,6 +118,19 @@ export default function GeneratePage() {
     try {
       const result = await generateAndAnalyze(values.feedback, values.contentType)
       setResults(result);
+
+      if (result.content) {
+        addProject({
+          id: `proj_${Date.now()}`,
+          title: result.content.title,
+          status: 'Active',
+          contentItems: 1,
+          lastUpdated: new Date().toISOString().split('T')[0],
+          content: result.content.content,
+          contentType: result.content.contentType,
+        });
+      }
+
       toast({
         title: "Success!",
         description: "Content generated and analyzed successfully.",

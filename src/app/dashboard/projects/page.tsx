@@ -1,3 +1,6 @@
+
+"use client";
+
 import {
   Table,
   TableBody,
@@ -15,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, Eye, File, Search } from "lucide-react"
+import { MoreHorizontal, File, Search } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -25,40 +28,11 @@ import {
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-
-const mockProjects = [
-    {
-        id: 'proj_1',
-        title: 'Q2 Marketing Campaign Content',
-        status: 'Active',
-        contentItems: 12,
-        lastUpdated: '2024-05-28',
-    },
-    {
-        id: 'proj_2',
-        title: 'New Feature Launch Microsite',
-        status: 'Completed',
-        contentItems: 8,
-        lastUpdated: '2024-05-15',
-    },
-    {
-        id: 'proj_3',
-        title: 'Customer Testimonial Blog Posts',
-        status: 'Active',
-        contentItems: 5,
-        lastUpdated: '2024-05-25',
-    },
-    {
-        id: 'proj_4',
-        title: 'Social Media Response Templates',
-        status: 'Archived',
-        contentItems: 25,
-        lastUpdated: '2024-04-10',
-    },
-]
-
+import { useProjectsStore } from "@/lib/projects-store"
 
 export default function ProjectsPage() {
+  const { projects } = useProjectsStore();
+
   return (
     <Card>
       <CardHeader>
@@ -91,7 +65,7 @@ export default function ProjectsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockProjects.map((project) => (
+            {projects.map((project) => (
                 <TableRow key={project.id}>
                     <TableCell className="font-medium">{project.title}</TableCell>
                     <TableCell>
