@@ -28,6 +28,7 @@ export default function EditorPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [newFeedback, setNewFeedback] = useState("");
   const [isRefining, setIsRefining] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -59,15 +60,18 @@ export default function EditorPage() {
             throw new Error(result.error);
         }
         if(result.content) {
-            updateProject(project.id, { content: result.content });
-            // Manually update the project state to trigger re-render of textarea
-            setProject(prev => prev ? { ...prev, content: result.content! } : null);
+            const updatedContent = result.content;
+            // Update the project in the zustand store
+            updateProject(project.id, { content: updatedContent });
+            // Manually update the local project state to trigger re-render of textarea
+            setProject(prev => prev ? { ...prev, content: updatedContent } : null);
         }
         toast({
             title: "Content Refined!",
             description: "The project has been updated with the refined content.",
         });
         setNewFeedback("");
+        setIsDialogOpen(false); // Close the dialog on success
     } catch (error) {
         toast({
             title: "Refinement Failed",
@@ -97,7 +101,7 @@ export default function EditorPage() {
                 <h1 className="text-2xl font-bold font-headline">{project.title}</h1>
             </div>
             <div className="flex gap-2">
-                <Dialog>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4"/> Refine with New Feedback</Button>
                     </DialogTrigger>
