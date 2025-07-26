@@ -21,6 +21,7 @@ const GenerateContentInputSchema = z.object({
 export type GenerateContentInput = z.infer<typeof GenerateContentInputSchema>;
 
 const GenerateContentOutputSchema = z.object({
+  title: z.string().describe('A concise and descriptive title for the generated content, based on the feedback.'),
   content: z.string().describe('The generated content.'),
 });
 export type GenerateContentOutput = z.infer<typeof GenerateContentOutputSchema>;
@@ -34,6 +35,8 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateContentInputSchema},
   output: {schema: GenerateContentOutputSchema},
   prompt: `You are an AI assistant that generates branded content based on customer feedback.
+
+  First, create a concise and descriptive title for the content based on the provided feedback.
 
   {{#if previousContent}}
   A previous version of the content exists. Refine the following content based on the new customer feedback provided.
@@ -58,7 +61,7 @@ const prompt = ai.definePrompt({
   Use the following content tone: {{contentTone}}
   {{/if}}
 
-  Your final output should be only the new, refined content.
+  Your final output should be only the new, refined content, prefixed with the generated title.
   `,
 });
 

@@ -5,7 +5,7 @@ import { analyzeFeedback, AnalyzeFeedbackOutput as AFOutput } from "@/ai/flows/a
 import { generateContent, GenerateContentOutput as GCOutput } from "@/ai/flows/generate-content"
 
 export type AnalyzeFeedbackOutput = AFOutput
-export type GenerateContentOutput = GCOutput & { contentType: string, title: string };
+export type GenerateContentOutput = GCOutput & { contentType: string };
 
 export async function generateAndAnalyze(
   feedback: string,
@@ -15,9 +15,6 @@ export async function generateAndAnalyze(
     // In a real app, brandColor and logo would come from user settings in DB
     const brandColor = "#3F51B5"
     const contentTone = "friendly"
-
-    // A simple title based on content type
-    const title = `New ${contentType.replace('_', ' ')} from feedback`;
 
     // Run AI calls in parallel for efficiency
     const [analysisResult, contentResult] = await Promise.all([
@@ -32,7 +29,7 @@ export async function generateAndAnalyze(
 
     return { 
         analysis: analysisResult, 
-        content: { ...contentResult, contentType, title }
+        content: { ...contentResult, contentType }
     }
   } catch (error) {
     console.error("Error in generateAndAnalyze:", error)

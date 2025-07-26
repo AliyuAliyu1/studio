@@ -58,7 +58,11 @@ export default function EditorPage() {
         if (result.error) {
             throw new Error(result.error);
         }
-        updateProject(project.id, { content: result.content });
+        if(result.content) {
+            updateProject(project.id, { content: result.content });
+            // Manually update the project state to trigger re-render of textarea
+            setProject(prev => prev ? { ...prev, content: result.content! } : null);
+        }
         toast({
             title: "Content Refined!",
             description: "The project has been updated with the refined content.",
@@ -118,12 +122,10 @@ export default function EditorPage() {
                             <DialogClose asChild>
                                 <Button variant="ghost">Cancel</Button>
                             </DialogClose>
-                            <DialogClose asChild>
-                                <Button onClick={handleRefineContent} disabled={isRefining}>
-                                    {isRefining ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4" />}
-                                    Refine Content
-                                </Button>
-                            </DialogClose>
+                            <Button onClick={handleRefineContent} disabled={isRefining}>
+                                {isRefining ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Sparkles className="mr-2 h-4 w-4" />}
+                                Refine Content
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -140,7 +142,7 @@ export default function EditorPage() {
             </CardHeader>
             <CardContent>
                 <Textarea 
-                    key={project.content} // Re-render when content changes
+                    key={project.id + project.content} // Re-render when content or project ID changes
                     defaultValue={project.content}
                     className="min-h-[60vh] text-base"
                 />
