@@ -17,6 +17,7 @@ import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const recentProjects = [
     {
@@ -56,6 +57,7 @@ export default function DashboardPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [feedback, setFeedback] = useState('');
     const [pastedFeedback, setPastedFeedback] = useState('');
+    const { toast } = useToast();
   
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -64,6 +66,10 @@ export default function DashboardPage() {
         reader.onload = (e) => {
           const content = e.target?.result as string;
           setFeedback(content);
+          toast({
+            title: "File Uploaded!",
+            description: "Your feedback file has been loaded successfully.",
+          });
         };
         reader.readAsText(file);
       }
@@ -71,8 +77,11 @@ export default function DashboardPage() {
 
     const handleGenerateContent = (contentType: "blog_post" | "social_media_post" | "microsite") => {
         if (!feedback) {
-          // In a real app, you'd want to show a toast or a message
-          alert("Please upload or paste feedback first.");
+          toast({
+            title: "No Feedback Provided",
+            description: "Please upload a file or paste text with customer feedback first.",
+            variant: "destructive",
+          });
           return;
         }
         
@@ -139,6 +148,10 @@ export default function DashboardPage() {
                                                 <Button type="button" onClick={() => {
                                                     setFeedback(pastedFeedback);
                                                     setPastedFeedback('');
+                                                    toast({
+                                                        title: "Feedback Saved!",
+                                                        description: "Your pasted feedback has been loaded.",
+                                                    })
                                                 }}>Save feedback</Button>
                                             </DialogClose>
                                         </DialogFooter>
@@ -266,5 +279,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
-    
