@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,6 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, TrendingUp, Sparkles, Pencil, Share2, Eye, Search, Play, MoreHorizontal, Globe } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 const recentProjects = [
     {
@@ -44,6 +48,36 @@ const recentProjects = [
 ]
 
 export default function DashboardPage() {
+    const router = useRouter();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [feedback, setFeedback] = useState('');
+  
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          setFeedback(content);
+        };
+        reader.readAsText(file);
+      }
+    };
+
+    const handleGenerateContent = (contentType: "blog_post" | "social_media_post" | "microsite") => {
+        if (!feedback) {
+          // In a real app, you'd want to show a toast or a message
+          alert("Please upload or paste feedback first.");
+          return;
+        }
+        
+        sessionStorage.setItem("feedbackData", feedback);
+        sessionStorage.setItem("contentType", contentType);
+
+        router.push("/dashboard/generate");
+    };
+
+
   return (
     <div className="space-y-10">
         <div>
@@ -63,8 +97,15 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent className="space-y-6 px-8 pb-8">
                         <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 bg-primary/5">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept=".csv,.json,.txt,.xlsx"
+                        />
                             <div className="flex justify-center gap-4 mb-2">
-                                <Button className="bg-indigo-600 hover:bg-indigo-700"><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
+                                <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
                                 <Button variant="outline" className="bg-white"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
                             </div>
                             <p className="text-center text-xs text-muted-foreground">Supports CSV, Excel, JSON, or plain text files</p>
@@ -126,14 +167,14 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                        <div className="space-y-1 pt-2">
-                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
-                               <Link href="/dashboard/generate"><FileText className="h-4 w-4" /> Generate Blog Post</Link>
+                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('blog_post')}>
+                               <FileText className="h-4 w-4" /> Generate Blog Post
                            </Button>
-                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
-                               <Link href="/dashboard/generate"><Share2 className="h-4 w-4" /> Create Social Media</Link>
+                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('social_media_post')}>
+                               <Share2 className="h-4 w-4" /> Create Social Media
                            </Button>
-                           <Button asChild variant="ghost" className="w-full justify-start gap-2 pl-2">
-                               <Link href="/dashboard/generate"><Globe className="h-4 w-4" /> Build Microsite</Link>
+                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('microsite')}>
+                               <Globe className="h-4 w-4" /> Build Microsite
                            </Button>
                        </div>
                     </CardContent>
@@ -182,7 +223,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex gap-2">
                 <Button variant="outline" className="bg-white">View Analysis</Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white"><Play className="mr-2 h-4 w-4 fill-current"/> Start Creating</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => handleGenerateContent('blog_post')}><Play className="mr-2 h-4 w-4 fill-current"/> Start Creating</Button>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -89,6 +89,21 @@ export default function GeneratePage() {
       contentType: undefined,
     },
   })
+
+  useEffect(() => {
+    const feedbackData = sessionStorage.getItem("feedbackData");
+    const contentTypeData = sessionStorage.getItem("contentType") as "blog_post" | "social_media_post" | "microsite" | null;
+
+    if (feedbackData && contentTypeData) {
+      form.setValue("feedback", feedbackData);
+      form.setValue("contentType", contentTypeData);
+      sessionStorage.removeItem("feedbackData");
+      sessionStorage.removeItem("contentType");
+      // Automatically submit the form
+      onSubmit({ feedback: feedbackData, contentType: contentTypeData });
+    }
+  }, []);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
