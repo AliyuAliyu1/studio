@@ -30,10 +30,16 @@ export async function generateContent(input: GenerateContentInput): Promise<Gene
   return generateContentFlow(input);
 }
 
+const MicrositeOutputSchema = z.object({
+  content: z.string().describe("The full HTML content for the microsite, wrapped in a single `<div>` tag. The first element inside the div should be an `<h1>` tag containing the site's title."),
+});
+
 const prompt = ai.definePrompt({
   name: 'generateContentPrompt',
   input: {schema: GenerateContentInputSchema},
-  output: {schema: GenerateContentOutputSchema},
+  output: {
+    schema: z.union([GenerateContentOutputSchema, MicrositeOutputSchema]),
+  },
   prompt: `You are an AI assistant that generates branded content based on customer feedback.
 
   {{#if (eq contentType "microsite")}}
@@ -47,6 +53,7 @@ const prompt = ai.definePrompt({
   - Add subtle animations and transitions using 'tailwindcss-animate' classes like 'animate-in', 'fade-in', 'slide-in-from-bottom'.
   - The content of the microsite should be based on the customer feedback provided.
   - The output should be ONLY the HTML content for the microsite, wrapped in a single div.
+  - The 'title' field in the output object should be an empty string.
   {{else}}
   First, create a concise and descriptive title for the content based on the provided feedback.
   
@@ -90,20 +97,25 @@ const generateContentFlow = ai.defineFlow(
     inputSchema: GenerateContentInputSchema,
     outputSchema: GenerateContentOutputSchema,
   },
-  async input => {
+  async (input): Promise<GenerateContentOutput> => {
     // For microsites, we ask the model to generate only the HTML content
     // and then we extract the title from the first <h1> tag.
     if (input.contentType === 'microsite') {
-      const { output } = await prompt(input);
-      const content = output!.content;
-
-      const titleMatch = content.match(/<h1.*?>(.*?)<\/h1>/);
+      const {output} = await prompt(input);
+      if (!output || !('content' in output)) {
+        throw new Error('Failed to generate microsite content.');
+      }
+      const content = output.content;
+      const titleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/);
       const title = titleMatch ? titleMatch[1] : 'Generated Microsite';
 
       return { title, content };
     }
 
     const {output} = await prompt(input);
-    return output!;
+     if (!output || !('title' in output) || !('content' in output)) {
+      throw new Error('Failed to generate content.');
+    }
+    return output as GenerateContentOutput;
   }
 );
