@@ -24,7 +24,7 @@ const formSchema = z.object({
   }),
 })
 
-function ResultsDisplay({ analysis, content, showReturnButton }: { analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null, showReturnButton: boolean }) {
+function ResultsDisplay({ analysis, content }: { analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null }) {
     if (!analysis || !content) return null;
 
     const sentimentIcon = () => {
@@ -77,14 +77,6 @@ function ResultsDisplay({ analysis, content, showReturnButton }: { analysis: Ana
                     </Card>
                 </div>
             </div>
-             {showReturnButton && <div className="text-center">
-                <Button asChild variant="outline">
-                    <Link href="/dashboard">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Create New Content
-                    </Link>
-                </Button>
-            </div>}
         </div>
     )
 }
@@ -92,7 +84,6 @@ function ResultsDisplay({ analysis, content, showReturnButton }: { analysis: Ana
 export default function GeneratePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<{ analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null }>({ analysis: null, content: null });
-  const [showReturnButton, setShowReturnButton] = useState(false);
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -121,11 +112,9 @@ export default function GeneratePage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     setResults({ analysis: null, content: null });
-    setShowReturnButton(false);
     try {
       const result = await generateAndAnalyze(values.feedback, values.contentType)
       setResults(result);
-      setShowReturnButton(true);
       toast({
         title: "Success!",
         description: "Content generated and analyzed successfully.",
@@ -144,14 +133,23 @@ export default function GeneratePage() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Generate Content from Feedback</CardTitle>
-          <CardDescription>
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="text-3xl font-bold font-headline">Generate Content from Feedback</h1>
+          <p className="text-muted-foreground">
             Input customer feedback, choose a content type, and let our AI do the rest.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <Button asChild variant="outline">
+            <Link href="/dashboard">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Create New Content
+            </Link>
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -226,7 +224,7 @@ export default function GeneratePage() {
         </div>
       )}
 
-      <ResultsDisplay analysis={results.analysis} content={results.content} showReturnButton={showReturnButton} />
+      <ResultsDisplay analysis={results.analysis} content={results.content} />
     </>
   )
 }
