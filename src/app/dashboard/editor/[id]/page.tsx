@@ -20,7 +20,7 @@ import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { refineProjectContent } from "./actions";
+import { refineProjectContent } from "@/app/dashboard/generate/actions";
 
 export default function EditorPage() {
   const router = useRouter();
