@@ -1,3 +1,6 @@
+
+"use client";
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -7,33 +10,48 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Download, Share2 } from "lucide-react"
+import { Download, Share2, ArrowLeft } from "lucide-react"
+import { useProjectsStore } from "@/lib/projects-store";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import type { Project } from "@/lib/projects-store";
+import Link from "next/link";
 
-const mockContent = {
-  id: 'c_1', 
-  title: "Our New Feature is a Game-Changer", 
-  type: 'blog_post', 
-  status: 'Published', 
-  date: '2024-05-21',
-  body: `We are thrilled to announce the launch of our latest feature, designed to revolutionize your workflow and boost productivity. Based on invaluable feedback from users like you, we've developed a tool that is not only powerful but also incredibly intuitive.
+export default function EditorPage() {
+  const router = useRouter();
+  const params = useParams();
+  const { projects } = useProjectsStore();
+  const [project, setProject] = useState<Project | null>(null);
 
-### Key Highlights:
-- **Seamless Integration:** Works perfectly with your existing tools.
-- **Enhanced Speed:** Experience up to 50% faster processing times.
-- **User-Friendly Interface:** A clean, modern design that's easy to navigate.
+  useEffect(() => {
+    const projectId = params.id as string;
+    if (projectId) {
+      const foundProject = projects.find(p => p.id === projectId);
+      if (foundProject) {
+        setProject(foundProject);
+      } else {
+        // Handle project not found, maybe redirect or show an error
+        router.push('/dashboard/projects');
+      }
+    }
+  }, [params.id, projects, router]);
 
-We can't wait for you to try it out and see the difference it makes. Your feedback has been the driving force behind this innovation, and we're committed to continuing this journey of improvement together.
-`
-};
-
-export default function EditorPage({ params }: { params: { id: string } }) {
-  // In a real app, you would fetch content based on params.id
-  const content = mockContent;
+  if (!project) {
+    return <div>Loading...</div>; // Or a more sophisticated loading state
+  }
 
   return (
     <div className="grid gap-4">
         <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold font-headline">{content.title}</h1>
+            <div>
+                 <Button asChild variant="ghost" className="mb-2">
+                    <Link href="/dashboard/projects">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back to Projects
+                    </Link>
+                </Button>
+                <h1 className="text-2xl font-bold font-headline">{project.title}</h1>
+            </div>
             <div className="flex gap-2">
                 <Button variant="outline"><Download className="mr-2 h-4 w-4"/> Export as HTML</Button>
                 <Button><Share2 className="mr-2 h-4 w-4" /> Publish</Button>
@@ -43,12 +61,12 @@ export default function EditorPage({ params }: { params: { id: string } }) {
             <CardHeader>
                 <CardTitle>Content Editor</CardTitle>
                 <CardDescription>
-                    You are editing a <span className="font-semibold">{content.type.replace('_', ' ')}</span>.
+                    You are editing a <span className="font-semibold">{project.contentType.replace('_', ' ')}</span>.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Textarea 
-                    defaultValue={content.body}
+                    defaultValue={project.content}
                     className="min-h-[60vh] text-base"
                 />
             </CardContent>

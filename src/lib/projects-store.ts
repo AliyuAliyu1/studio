@@ -17,6 +17,7 @@ export interface Project {
 interface ProjectsState {
   projects: Project[];
   addProject: (project: Project) => void;
+  deleteProject: (id: string) => void;
 }
 
 export const useProjectsStore = create<ProjectsState>()(
@@ -44,6 +45,10 @@ export const useProjectsStore = create<ProjectsState>()(
       ],
       addProject: (project) =>
         set((state) => ({ projects: [project, ...state.projects] })),
+      deleteProject: (id) =>
+        set((state) => ({
+          projects: state.projects.filter((project) => project.id !== id),
+        })),
     }),
     {
       name: 'projects-storage',
