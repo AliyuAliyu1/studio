@@ -1,8 +1,5 @@
 "use server"
 
-import { getAuth } from "firebase-admin/auth";
-import { initFirebaseAdminApp } from "@/lib/firebase-admin";
-
 // Note: This is a simplified login for demonstration.
 // In a real app, you would verify the user's password using a client-side SDK
 // like Firebase Authentication for web, and then get the ID token to verify on the server.

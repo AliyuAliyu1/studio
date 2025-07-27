@@ -24,6 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 
 const formSchema = z.object({
+  fullName: z.string().min(2, { message: "Full name is required." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   companyName: z.string().min(2, { message: "Company name is required." }),
@@ -33,21 +34,6 @@ const formSchema = z.object({
   marketing: z.boolean().optional(),
 })
 
-// Mock signup action for the new form
-async function signupV2(data: Omit<z.infer<typeof formSchema>, 'terms' | 'marketing'>) {
-    try {
-      const result = await signup({
-          fullName: 'User', // FullName is not in the new form, using a placeholder
-          email: data.email,
-          password: data.password,
-      });
-      return result;
-    } catch(e) {
-        return { error: 'An unknown error occurred.'}
-    }
-}
-
-
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -56,6 +42,7 @@ export function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
       companyName: "",
@@ -69,7 +56,7 @@ export function SignupForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const result = await signupV2(values)
+      const result = await signup(values)
       if (result.error) {
         throw new Error(result.error)
       }
@@ -92,6 +79,19 @@ export function SignupForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+         <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="email"
