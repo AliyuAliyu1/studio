@@ -2,11 +2,13 @@
 import { initFirebaseAdminApp } from "@/lib/firebase-admin";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-// Initialize Firebase Admin App
+// This file is intended for server-side use only.
+// It is imported by server actions in `src/lib/firebase/actions.ts`.
+
 const app = initFirebaseAdminApp();
 const db = getFirestore(app);
 
-const PROJECTS_COLLECTION = 'projects';
+export const PROJECTS_COLLECTION = 'projects';
 
 export interface ProjectData {
     title: string;
@@ -15,7 +17,6 @@ export interface ProjectData {
     content: string;
     contentType: string;
 }
-
 
 export interface Project extends ProjectData {
   id: string;
@@ -30,10 +31,14 @@ export async function getProjects(): Promise<Project[]> {
         }
         return snapshot.docs.map(doc => {
             const data = doc.data();
+            const lastUpdatedTimestamp = data.lastUpdated;
+            // Handle both Firestore Timestamp and ISO string formats
+            const lastUpdated = lastUpdatedTimestamp?.toDate ? lastUpdatedTimestamp.toDate() : new Date(lastUpdatedTimestamp);
+
             return {
                 id: doc.id,
                 ...data,
-                lastUpdated: data.lastUpdated.toDate().toISOString().split('T')[0],
+                lastUpdated: lastUpdated.toISOString().split('T')[0],
             } as Project;
         });
     } catch (error) {
@@ -68,7 +73,6 @@ export async function updateProject(id: string, updates: Partial<ProjectData>): 
         throw new Error("Failed to update project in Firestore.");
     }
 }
-
 
 export async function deleteProject(id: string): Promise<void> {
     try {

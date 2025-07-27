@@ -2,8 +2,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { getProjects, addProject as addProjectToFirestore, deleteProject as deleteProjectFromFirestore, updateProject as updateProjectInFirestore } from '@/lib/firebase/firestore';
+import { getProjects, addProject, deleteProject, updateProject } from '@/lib/firebase/actions';
 import type { Project, ProjectData } from '@/lib/firebase/firestore';
 
 
@@ -13,7 +12,7 @@ interface ProjectsState {
   fetchProjects: () => Promise<void>;
   addProject: (projectData: ProjectData) => Promise<string>;
   deleteProject: (id: string) => Promise<void>;
-  updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
+  updateProject: (id: string, updates: Partial<ProjectData>) => Promise<void>;
   setCurrentProjectId: (id: string | null) => void;
   getProjectById: (id: string) => Project | undefined;
 }
@@ -23,20 +22,24 @@ export const useProjectsStore = create<ProjectsState>()(
       projects: [],
       currentProjectId: null,
       fetchProjects: async () => {
-        const projects = await getProjects();
-        set({ projects });
+        try {
+            const projects = await getProjects();
+            set({ projects });
+        } catch (error) {
+            console.error("Failed to fetch projects for store:", error);
+        }
       },
       addProject: async (projectData) => {
-        const newProjectId = await addProjectToFirestore(projectData);
+        const newProjectId = await addProject(projectData);
         await get().fetchProjects(); // Refresh the list
         return newProjectId;
       },
       deleteProject: async (id) => {
-        await deleteProjectFromFirestore(id);
+        await deleteProject(id);
         await get().fetchProjects(); // Refresh the list
       },
       updateProject: async (id, updates) => {
-        await updateProjectInFirestore(id, updates);
+        await updateProject(id, updates);
         await get().fetchProjects(); // Refresh the list
       },
       setCurrentProjectId: (id) => set({ currentProjectId: id }),

@@ -38,15 +38,26 @@ export default function EditorPage() {
     if (projectId) {
       const loadProject = async () => {
         setIsLoading(true);
-        await fetchProjects(); // Ensure we have the latest projects
+        // We call fetchProjects here which is now a server action via the store
+        await fetchProjects();
         const foundProject = getProjectById(projectId);
         if (foundProject) {
           setProject(foundProject);
           setEditedContent(foundProject.content);
           setCurrentProjectId(projectId);
         } else {
-          toast({ title: "Project not found", variant: "destructive" });
-          router.push('/dashboard/projects');
+          // This part of the logic might need adjustment
+          // For now, let's see if fetching solves the initial load problem
+          const projects = useProjectsStore.getState().projects;
+          const projectFromState = projects.find(p => p.id === projectId);
+          if (projectFromState) {
+            setProject(projectFromState);
+            setEditedContent(projectFromState.content);
+            setCurrentProjectId(projectId);
+          } else {
+             toast({ title: "Project not found", variant: "destructive" });
+             router.push('/dashboard/projects');
+          }
         }
         setIsLoading(false);
       }
@@ -75,9 +86,15 @@ export default function EditorPage() {
         }
         if(result.content && result.title) {
             const updatedProjectData = { content: result.content, title: result.title };
+            // `updateProject` is now a server action via the store
             await updateProject(project.id, updatedProjectData);
-            setProject(prev => prev ? { ...prev, ...updatedProjectData } : null);
-            setEditedContent(result.content); // Update the textarea content
+            
+            // Re-fetch project from store to get the latest state
+            const updatedProjectFromStore = useProjectsStore.getState().getProjectById(project.id);
+            if (updatedProjectFromStore) {
+              setProject(updatedProjectFromStore);
+              setEditedContent(updatedProjectFromStore.content); // Update the textarea content
+            }
         }
         toast({
             title: "Content Refined!",

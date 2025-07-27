@@ -69,7 +69,11 @@ function ResultsDisplay({ analysis, content, onReset }: { analysis: AnalyzeFeedb
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Textarea value={content.content} readOnly className="h-96 text-base bg-gray-50" />
+                            {content.contentType === 'microsite' ? (
+                                <div className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: content.content }} />
+                            ) : (
+                                <Textarea value={content.content} readOnly className="h-96 text-base bg-gray-50" />
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -108,7 +112,7 @@ export default function GeneratePage() {
   const [results, setResults] = useState<{ analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null }>({ analysis: null, content: null });
   const { toast } = useToast()
   const router = useRouter();
-  const { addProject, updateProject, getProjectById, currentProjectId, setCurrentProjectId } = useProjectsStore();
+  const { addProject, getProjectById, currentProjectId, setCurrentProjectId, updateProject } = useProjectsStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -141,63 +145,34 @@ export default function GeneratePage() {
     setIsLoading(true);
 
     try {
-        if (currentProjectId) {
-            // Refine existing project
-            const projectToUpdate = getProjectById(currentProjectId);
-            if (!projectToUpdate) {
-                throw new Error("Project to update not found.");
-            }
-            const refinedResult = await refineProjectContent(projectToUpdate as Project, values.feedback);
-
-            if (refinedResult.error) throw new Error(refinedResult.error);
-
-            if(refinedResult.content && refinedResult.title) {
-                const updatedProjectData = { 
-                    content: refinedResult.content, 
-                    title: refinedResult.title 
-                };
-                await updateProject(currentProjectId, updatedProjectData);
-                 // To display results, we need analysis. Let's run it again.
-                const analysisResult = await generateAndAnalyze(values.feedback, values.contentType as any);
-                setResults({
-                    analysis: analysisResult.analysis,
-                    content: { ...updatedProjectData, contentType: values.contentType }
-                });
-            }
-
-            toast({
-                title: "Project Refined!",
-                description: "The existing project has been updated with the new content.",
-            });
-        } else {
-            // Create new project
-            const result = await generateAndAnalyze(values.feedback, values.contentType);
-            setResults(result);
-
-            if (result.content) {
-                const newProjectId = await addProject({
-                    title: result.content.title,
-                    status: 'Active',
-                    contentItems: 1,
-                    content: result.content.content,
-                    contentType: result.content.contentType,
-                });
-                setCurrentProjectId(newProjectId); // Set as current project
-                router.push(`/dashboard/editor/${newProjectId}`);
-            }
-
-            toast({
-                title: "Success!",
-                description: "Content generated and analyzed successfully.",
-                variant: "default",
-            });
-        }
+      const result = await generateAndAnalyze(values.feedback, values.contentType);
+      
+      if (result.content) {
+          const newProjectId = await addProject({
+              title: result.content.title,
+              status: 'Active',
+              contentItems: 1,
+              content: result.content.content,
+              contentType: result.content.contentType,
+          });
+          setCurrentProjectId(newProjectId); // Set as current project
+          setResults(result); // Show results on the page
+          toast({
+              title: "Success!",
+              description: "Content generated and analyzed successfully.",
+              variant: "default",
+          });
+          // No need to redirect here anymore, results display on the same page
+      } else {
+          throw new Error("Failed to get content from generation result.");
+      }
     } catch (error) {
         toast({
             title: "Error",
             description: error instanceof Error ? error.message : "An unknown error occurred.",
             variant: "destructive",
         });
+        setResults({ analysis: null, content: null });
     } finally {
         setIsLoading(false);
     }
@@ -213,83 +188,79 @@ export default function GeneratePage() {
             Input customer feedback, choose a content type, and let our AI do the rest.
           </p>
         </div>
-        <Button asChild variant="outline" onClick={resetForm}>
-            <Link href="/dashboard/generate">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Start Over
-            </Link>
-        </Button>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="feedback"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Step 1: Input Feedback</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., 'The new dashboard is incredibly intuitive and has saved our team hours of work!'"
-                        className="min-h-[150px] text-base"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contentType"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Step 2: Choose Content Type</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col sm:flex-row gap-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="blog_post" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Blog Post</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="social_media_post" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Social Media Post</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="microsite" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Microsite</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading} size="lg">
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  currentProjectId ? <RefreshCw className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />
-                )}
-                {currentProjectId ? 'Refine Project' : 'Generate New Content'}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+     {(!results.content && !isLoading) && (
+        <Card>
+            <CardContent className="pt-6">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="feedback"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Step 1: Input Feedback</FormLabel>
+                        <FormControl>
+                        <Textarea
+                            placeholder="e.g., 'The new dashboard is incredibly intuitive and has saved our team hours of work!'"
+                            className="min-h-[150px] text-base"
+                            {...field}
+                        />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="contentType"
+                    render={({ field }) => (
+                    <FormItem className="space-y-3">
+                        <FormLabel>Step 2: Choose Content Type</FormLabel>
+                        <FormControl>
+                        <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col sm:flex-row gap-4"
+                        >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                                <RadioGroupItem value="blog_post" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Blog Post</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                                <RadioGroupItem value="social_media_post" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Social Media Post</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                                <RadioGroupItem value="microsite" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Microsite</FormLabel>
+                            </FormItem>
+                        </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <Button type="submit" disabled={isLoading} size="lg">
+                    {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    )}
+                    Generate Content
+                </Button>
+                </form>
+            </Form>
+            </CardContent>
+        </Card>
+      )}
 
       {isLoading && (
         <div className="flex justify-center items-center py-16">

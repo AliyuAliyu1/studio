@@ -30,6 +30,6 @@ export function initFirebaseAdminApp(): App {
     
     return initializeApp({
         credential: cert(serviceAccount),
-        projectId: getProjectFromService-account(),
+        projectId: getProjectFromServiceAccount(),
     }, appName);
 }
