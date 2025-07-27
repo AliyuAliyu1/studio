@@ -1,55 +1,53 @@
 
 import { initializeApp, getApps, App, cert } from 'firebase-admin/app';
+import { getAuth, Auth } from 'firebase-admin/auth';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
-// This is a mock service account for local development & preview environments
-// In a real production environment, you should use a secure way to load your service account key.
-const mockServiceAccount = {
-  "type": "service_account",
-  "project_id": "your-project-id",
-  "private_key_id": "your-private-key-id",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-your-stuff@your-project-id.iam.gserviceaccount.com",
-  "client_id": "your-client-id",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-your-stuff%40your-project-id.iam.gserviceaccount.com"
-};
+const appName = "firebase-admin-app-content-spark";
+let app: App | null = null;
 
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-  : mockServiceAccount; // Use mock if env var is not set
+function initFirebaseAdminApp(): App | null {
+  if (app) {
+    return app;
+  }
 
-const getProjectFromServiceAccount = () => {
-    if (!serviceAccount || serviceAccount === mockServiceAccount) return undefined;
-    return serviceAccount.project_id;
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!serviceAccountJson) {
+    console.warn(
+      "FIREBASE_SERVICE_ACCOUNT environment variable is not set. " +
+      "Firebase Admin SDK will not be initialized. " +
+      "This is expected for local development and preview deployments if you haven't set it up."
+    );
+    return null;
+  }
+
+  try {
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    const apps = getApps();
+    const existingApp = apps.find(a => a.name === appName);
+    if (existingApp) {
+      app = existingApp;
+    } else {
+      app = initializeApp({
+        credential: cert(serviceAccount),
+        projectId: serviceAccount.project_id,
+      }, appName);
+    }
+    return app;
+  } catch (e) {
+    console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT or initialize Firebase Admin SDK.", e);
+    return null;
+  }
 }
 
+const adminApp = initFirebaseAdminApp();
 
-const appName = "firebase-admin-app";
+export function getAdminFirestore(): Firestore | null {
+  if (!adminApp) return null;
+  return getFirestore(adminApp);
+}
 
-export function initFirebaseAdminApp(): App {
-    const apps = getApps();
-    const existingApp = apps.find(app => app.name === appName);
-    if (existingApp) {
-        return existingApp;
-    }
-
-    // When the service account is the mock one, we can't initialize the app
-    // This will cause Firestore operations to fail gracefully, but it prevents the app from crashing.
-    if (serviceAccount === mockServiceAccount) {
-        console.warn("Firebase Admin SDK is not initialized. Using mock data. Set FIREBASE_SERVICE_ACCOUNT env var for full functionality.")
-        // Return a mock app object to prevent crashes
-        return { 
-            name: '[DEFAULT]', // Using '[DEFAULT]' to mimic a real app's name, which helps in some checks.
-            options: {}, 
-            auth: () => null, 
-            firestore: () => null 
-        } as unknown as App;
-    }
-    
-    return initializeApp({
-        credential: cert(serviceAccount),
-        projectId: getProjectFromServiceAccount(),
-    }, appName);
+export function getAdminAuth(): Auth | null {
+  if (!adminApp) return null;
+  return getAuth(adminApp);
 }

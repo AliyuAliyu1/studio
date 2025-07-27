@@ -1,10 +1,7 @@
-import { initFirebaseAdminApp } from "@/lib/firebase-admin";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getAdminFirestore } from "@/lib/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
-const app = initFirebaseAdminApp();
-// The app might be a mock object if the service account is not set.
-// In that case, db will be null, and we'll handle it in the functions.
-const db = app.name !== '[DEFAULT]' ? getFirestore(app) : null;
+const db = getAdminFirestore();
 
 export const PROJECTS_COLLECTION = 'projects';
 export const MICROSITES_COLLECTION = 'microsites';
@@ -49,7 +46,8 @@ export async function getProjects(): Promise<Project[]> {
         return snapshot.docs.map(doc => {
             const data = doc.data();
             const lastUpdatedTimestamp = data.lastUpdated;
-            const lastUpdated = lastUpdatedTimestamp?.toDate ? lastUpdatedTimestamp.toDate() : new Date(lastUpdatedTimestamp);
+            // Handle both Timestamp and server-written string formats
+            const lastUpdated = lastUpdatedTimestamp?.toDate ? lastUpdatedTimestamp.toDate() : new Date(lastUpdatedTimestamp || Date.now());
 
             return {
                 id: doc.id,
@@ -66,8 +64,8 @@ export async function getProjects(): Promise<Project[]> {
 
 export async function addProject(projectData: ProjectData): Promise<string> {
      if (!db) {
-        console.warn("Firestore is not initialized. Cannot add project.");
-        return "mock-project-id";
+        console.warn("Firestore is not initialized. Cannot add project. Returning mock ID.");
+        return `mock-project-${Date.now()}`;
     }
     try {
         const docRef = await db.collection(PROJECTS_COLLECTION).add({
@@ -83,7 +81,7 @@ export async function addProject(projectData: ProjectData): Promise<string> {
 
 export async function updateProject(id: string, updates: Partial<ProjectData>): Promise<void> {
     if (!db) {
-        console.warn("Firestore is not initialized. Cannot update project.");
+        console.warn(`Firestore is not initialized. Cannot update project ${id}.`);
         return;
     }
     try {
@@ -100,7 +98,7 @@ export async function updateProject(id: string, updates: Partial<ProjectData>): 
 
 export async function deleteProject(id: string): Promise<void> {
     if (!db) {
-        console.warn("Firestore is not initialized. Cannot delete project.");
+        console.warn(`Firestore is not initialized. Cannot delete project ${id}.`);
         return;
     }
     try {
@@ -115,8 +113,8 @@ export async function deleteProject(id: string): Promise<void> {
 
 export async function addMicrosite(data: Omit<Microsite, 'id' | 'createdAt'>): Promise<string> {
     if (!db) {
-        console.warn("Firestore is not initialized. Cannot add microsite.");
-        return "mock-microsite-id";
+        console.warn("Firestore is not initialized. Cannot add microsite. Returning mock ID.");
+        return `mock-microsite-${Date.now()}`;
     }
     try {
         const docRef = await db.collection(MICROSITES_COLLECTION).add({
@@ -132,7 +130,7 @@ export async function addMicrosite(data: Omit<Microsite, 'id' | 'createdAt'>): P
 
 export async function getMicrositeBySlug(slug: string): Promise<Microsite | null> {
     if (!db) {
-        console.warn("Firestore is not initialized. Cannot get microsite.");
+        console.warn(`Firestore is not initialized. Cannot get microsite by slug: ${slug}.`);
         return null;
     }
     try {
