@@ -19,6 +19,7 @@ import Link from "next/link"
 import { useProjectsStore } from "@/lib/projects-store";
 import { useRouter } from "next/navigation"
 import { Project } from "@/lib/firebase/firestore"
+import { MicrositeRenderer } from "@/components/microsite-renderer"
 
 const formSchema = z.object({
   feedback: z.string().min(20, { message: "Feedback must be at least 20 characters." }),
@@ -61,6 +62,9 @@ function ResultsDisplay({ analysis, content, onReset }: { analysis: AnalyzeFeedb
             </div>
             <div className="grid lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
+                     {content.contentType === 'microsite' ? (
+                        <MicrositeRenderer title={content.title} content={content.content} />
+                    ) : (
                     <Card>
                         <CardHeader>
                             <CardTitle className="font-headline">{content.title}</CardTitle>
@@ -69,13 +73,10 @@ function ResultsDisplay({ analysis, content, onReset }: { analysis: AnalyzeFeedb
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {content.contentType === 'microsite' ? (
-                                <div className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: content.content }} />
-                            ) : (
-                                <Textarea value={content.content} readOnly className="h-96 text-base bg-gray-50" />
-                            )}
+                            <Textarea value={content.content} readOnly className="h-96 text-base bg-gray-50" />
                         </CardContent>
                     </Card>
+                    )}
                 </div>
                 <div>
                     <Card>

@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Download, Share2, ArrowLeft, RefreshCw, Sparkles, Loader2 } from "lucide-react"
@@ -16,10 +16,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/firebase/firestore";
 import Link from "next/link";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription as DialogDescriptionComponent, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { refineProjectContent } from "@/app/dashboard/generate/actions";
+import { MicrositeRenderer } from "@/components/microsite-renderer";
 
 export default function EditorPage() {
   const router = useRouter();
@@ -138,9 +139,9 @@ export default function EditorPage() {
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Refine Content</DialogTitle>
-                            <DialogDescription>
+                            <DialogDescriptionComponent>
                                 Provide new customer feedback to refine the existing content. The AI will use this feedback to improve the current version.
-                            </DialogDescription>
+                            </DialogDescriptionComponent>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <Label htmlFor="new-feedback" className="sr-only">New Feedback</Label>
@@ -167,25 +168,26 @@ export default function EditorPage() {
                 <Button><Share2 className="mr-2 h-4 w-4" /> Publish</Button>
             </div>
         </div>
-        <Card>
-            <CardHeader>
-                <CardTitle>Content Editor</CardTitle>
-                <CardDescription>
-                    You are editing a <span className="font-semibold">{project.contentType.replace('_', ' ')}</span>.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                {project.contentType === 'microsite' ? (
-                  <div className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: editedContent }} />
-                ) : (
-                  <Textarea 
-                      value={editedContent}
-                      onChange={(e) => setEditedContent(e.target.value)}
-                      className="min-h-[60vh] text-base"
-                  />
-                )}
-            </CardContent>
-        </Card>
+       
+        {project.contentType === 'microsite' ? (
+          <MicrositeRenderer title={project.title} content={editedContent} />
+        ) : (
+          <Card>
+              <CardHeader>
+                  <CardTitle>Content Editor</CardTitle>
+                  <CardDescription>
+                      You are editing a <span className="font-semibold">{project.contentType.replace('_', ' ')}</span>.
+                  </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea 
+                    value={editedContent}
+                    onChange={(e) => setEditedContent(e.target.value)}
+                    className="min-h-[60vh] text-base"
+                />
+              </CardContent>
+          </Card>
+        )}
     </div>
   )
 }
