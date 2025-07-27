@@ -27,17 +27,22 @@ export async function generateAndAnalyze(
         brandColor,
         contentTone,
       }),
-    ])
-    
+    ]);
+
+    console.log("AI Generation Result:", JSON.stringify(contentResult, null, 2));
+
     let slug;
     if (contentType === 'microsite') {
-        slug = contentResult.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-        await addMicrosite({
-            title: contentResult.title,
-            slug: slug,
-            html: contentResult.content,
-            brandColor: brandColor,
-        });
+      if (!contentResult.content) {
+        throw new Error("AI failed to generate HTML content for the microsite.");
+      }
+      slug = contentResult.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+      await addMicrosite({
+          title: contentResult.title,
+          slug: slug,
+          html: contentResult.content,
+          brandColor: brandColor,
+      });
     }
 
     return { 
@@ -45,9 +50,10 @@ export async function generateAndAnalyze(
         content: { ...contentResult, contentType, slug }
     }
   } catch (error) {
-    console.error("Error in generateAndAnalyze:", error)
-    // Provide a more user-friendly error message
-    throw new Error("Failed to generate content due to a server error. Please try again later.")
+    console.error("Error in generateAndAnalyze:", error);
+    // Provide a more user-friendly error message that includes the actual error
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+    throw new Error(`Failed to generate content due to a server error: ${errorMessage}`);
   }
 }
 
