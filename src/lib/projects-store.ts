@@ -3,67 +3,45 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { getProjects, addProject as addProjectToFirestore, deleteProject as deleteProjectFromFirestore, updateProject as updateProjectInFirestore } from '@/lib/firebase/firestore';
+import type { Project, ProjectData } from '@/lib/firebase/firestore';
 
-export interface Project {
-  id: string;
-  title: string;
-  status: 'Active' | 'Completed' | 'Archived';
-  contentItems: number;
-  lastUpdated: string;
-  content: string;
-  contentType: string;
-}
 
 interface ProjectsState {
   projects: Project[];
   currentProjectId: string | null;
-  addProject: (project: Project) => void;
-  deleteProject: (id: string) => void;
-  updateProject: (id: string, updates: Partial<Project>) => void;
+  fetchProjects: () => Promise<void>;
+  addProject: (projectData: ProjectData) => Promise<string>;
+  deleteProject: (id: string) => Promise<void>;
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>;
   setCurrentProjectId: (id: string | null) => void;
+  getProjectById: (id: string) => Project | undefined;
 }
 
 export const useProjectsStore = create<ProjectsState>()(
-  persist(
-    (set) => ({
-      projects: [
-        {
-          id: 'proj_1',
-          title: 'Q2 Marketing Campaign Content',
-          status: 'Active',
-          contentItems: 12,
-          lastUpdated: '2024-05-28',
-          content: 'Initial content for Q2 marketing.',
-          contentType: 'blog_post',
-        },
-        {
-          id: 'proj_2',
-          title: 'New Feature Launch Microsite',
-          status: 'Completed',
-          contentItems: 8,
-          lastUpdated: '2024-05-15',
-          content: 'Microsite content for new feature.',
-          contentType: 'microsite',
-        },
-      ],
+    (set, get) => ({
+      projects: [],
       currentProjectId: null,
-      addProject: (project) =>
-        set((state) => ({ projects: [project, ...state.projects] })),
-      deleteProject: (id) =>
-        set((state) => ({
-          projects: state.projects.filter((project) => project.id !== id),
-        })),
-      updateProject: (id, updates) =>
-        set((state) => ({
-            projects: state.projects.map((p) =>
-                p.id === id ? { ...p, ...updates, lastUpdated: new Date().toISOString().split('T')[0] } : p
-            ),
-        })),
+      fetchProjects: async () => {
+        const projects = await getProjects();
+        set({ projects });
+      },
+      addProject: async (projectData) => {
+        const newProjectId = await addProjectToFirestore(projectData);
+        await get().fetchProjects(); // Refresh the list
+        return newProjectId;
+      },
+      deleteProject: async (id) => {
+        await deleteProjectFromFirestore(id);
+        await get().fetchProjects(); // Refresh the list
+      },
+      updateProject: async (id, updates) => {
+        await updateProjectInFirestore(id, updates);
+        await get().fetchProjects(); // Refresh the list
+      },
       setCurrentProjectId: (id) => set({ currentProjectId: id }),
-    }),
-    {
-      name: 'projects-storage',
-      storage: createJSONStorage(() => sessionStorage),
-    }
-  )
+      getProjectById: (id: string) => {
+        return get().projects.find(p => p.id === id);
+      }
+    })
 );

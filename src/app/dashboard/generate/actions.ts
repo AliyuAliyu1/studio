@@ -3,7 +3,7 @@
 
 import { analyzeFeedback, AnalyzeFeedbackOutput as AFOutput } from "@/ai/flows/analyze-feedback"
 import { generateContent, GenerateContentOutput as GCOutput } from "@/ai/flows/generate-content"
-import type { Project } from "@/lib/projects-store";
+import type { Project } from "@/lib/firebase/firestore";
 
 export type AnalyzeFeedbackOutput = AFOutput
 export type GenerateContentOutput = GCOutput & { contentType: string };

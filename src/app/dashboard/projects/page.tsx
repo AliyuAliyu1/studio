@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, File, Search, Trash2, Edit, Eye } from "lucide-react"
+import { MoreHorizontal, File, Search, Trash2, Edit, Eye, Loader2 } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -44,18 +44,37 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ProjectsPage() {
-  const { projects, deleteProject } = useProjectsStore();
+  const { projects, deleteProject, fetchProjects } = useProjectsStore();
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const { toast } = useToast();
 
-  const handleDelete = () => {
+  useEffect(() => {
+    const loadProjects = async () => {
+        setIsLoading(true);
+        await fetchProjects();
+        setIsLoading(false);
+    }
+    loadProjects();
+  }, [fetchProjects]);
+
+  const handleDelete = async () => {
     if (deleteId) {
-      deleteProject(deleteId);
-      toast({
-        title: "Project Deleted",
-        description: "The project has been successfully deleted.",
-      });
-      setDeleteId(null);
+      try {
+        await deleteProject(deleteId);
+        toast({
+          title: "Project Deleted",
+          description: "The project has been successfully deleted.",
+        });
+      } catch (error) {
+        toast({
+            title: "Error",
+            description: "Failed to delete project.",
+            variant: "destructive"
+        })
+      } finally {
+        setDeleteId(null);
+      }
     }
   };
 
@@ -81,6 +100,11 @@ export default function ProjectsPage() {
                    </Button>
               </div>
           </div>
+          {isLoading ? (
+             <div className="flex justify-center items-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+             </div>
+          ) : (
           <Table>
             <TableHeader>
               <TableRow>
@@ -135,6 +159,7 @@ export default function ProjectsPage() {
               ))}
             </TableBody>
           </Table>
+          )}
         </CardContent>
       </Card>
       

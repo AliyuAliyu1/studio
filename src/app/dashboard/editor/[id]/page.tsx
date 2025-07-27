@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { Button } from "@/components/ui/button"
@@ -15,7 +14,7 @@ import { Download, Share2, ArrowLeft, RefreshCw, Sparkles, Loader2 } from "lucid
 import { useProjectsStore } from "@/lib/projects-store";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { Project } from "@/lib/projects-store";
+import type { Project } from "@/lib/firebase/firestore";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -25,31 +24,39 @@ import { refineProjectContent } from "@/app/dashboard/generate/actions";
 export default function EditorPage() {
   const router = useRouter();
   const params = useParams();
-  const { projects, updateProject, setCurrentProjectId } = useProjectsStore();
+  const { getProjectById, updateProject, setCurrentProjectId, fetchProjects } = useProjectsStore();
   const [project, setProject] = useState<Project | null>(null);
   const [newFeedback, setNewFeedback] = useState("");
   const [isRefining, setIsRefining] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const [editedContent, setEditedContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const projectId = params.id as string;
     if (projectId) {
-      const foundProject = projects.find(p => p.id === projectId);
-      if (foundProject) {
-        setProject(foundProject);
-        setEditedContent(foundProject.content);
-        setCurrentProjectId(projectId);
-      } else {
-        router.push('/dashboard/projects');
+      const loadProject = async () => {
+        setIsLoading(true);
+        await fetchProjects(); // Ensure we have the latest projects
+        const foundProject = getProjectById(projectId);
+        if (foundProject) {
+          setProject(foundProject);
+          setEditedContent(foundProject.content);
+          setCurrentProjectId(projectId);
+        } else {
+          toast({ title: "Project not found", variant: "destructive" });
+          router.push('/dashboard/projects');
+        }
+        setIsLoading(false);
       }
+      loadProject();
     }
     // Cleanup when leaving the page
     return () => {
         setCurrentProjectId(null);
     }
-  }, [params.id, projects, router, setCurrentProjectId]);
+  }, [params.id, getProjectById, router, setCurrentProjectId, toast, fetchProjects]);
 
   const handleRefineContent = async () => {
     if (!project || !newFeedback) {
@@ -68,7 +75,7 @@ export default function EditorPage() {
         }
         if(result.content && result.title) {
             const updatedProjectData = { content: result.content, title: result.title };
-            updateProject(project.id, updatedProjectData);
+            await updateProject(project.id, updatedProjectData);
             setProject(prev => prev ? { ...prev, ...updatedProjectData } : null);
             setEditedContent(result.content); // Update the textarea content
         }
@@ -90,8 +97,8 @@ export default function EditorPage() {
   }
 
 
-  if (!project) {
-    return <div>Loading...</div>; // Or a more sophisticated loading state
+  if (isLoading || !project) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
   return (
@@ -151,11 +158,15 @@ export default function EditorPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Textarea 
-                    value={editedContent}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                    className="min-h-[60vh] text-base"
-                />
+                {project.contentType === 'microsite' ? (
+                  <div className="prose lg:prose-xl" dangerouslySetInnerHTML={{ __html: editedContent }} />
+                ) : (
+                  <Textarea 
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      className="min-h-[60vh] text-base"
+                  />
+                )}
             </CardContent>
         </Card>
     </div>

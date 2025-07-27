@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -19,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { useProjectsStore } from "@/lib/projects-store";
 import { useRouter } from "next/navigation"
+import { Project } from "@/lib/firebase/firestore"
 
 const formSchema = z.object({
   feedback: z.string().min(20, { message: "Feedback must be at least 20 characters." }),
@@ -108,7 +108,7 @@ export default function GeneratePage() {
   const [results, setResults] = useState<{ analysis: AnalyzeFeedbackOutput | null; content: GenerateContentOutput | null }>({ analysis: null, content: null });
   const { toast } = useToast()
   const router = useRouter();
-  const { addProject, updateProject, projects, currentProjectId, setCurrentProjectId } = useProjectsStore();
+  const { addProject, updateProject, getProjectById, currentProjectId, setCurrentProjectId } = useProjectsStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -143,11 +143,11 @@ export default function GeneratePage() {
     try {
         if (currentProjectId) {
             // Refine existing project
-            const projectToUpdate = projects.find(p => p.id === currentProjectId);
+            const projectToUpdate = getProjectById(currentProjectId);
             if (!projectToUpdate) {
                 throw new Error("Project to update not found.");
             }
-            const refinedResult = await refineProjectContent(projectToUpdate, values.feedback);
+            const refinedResult = await refineProjectContent(projectToUpdate as Project, values.feedback);
 
             if (refinedResult.error) throw new Error(refinedResult.error);
 
@@ -156,7 +156,7 @@ export default function GeneratePage() {
                     content: refinedResult.content, 
                     title: refinedResult.title 
                 };
-                updateProject(currentProjectId, updatedProjectData);
+                await updateProject(currentProjectId, updatedProjectData);
                  // To display results, we need analysis. Let's run it again.
                 const analysisResult = await generateAndAnalyze(values.feedback, values.contentType as any);
                 setResults({
@@ -175,13 +175,10 @@ export default function GeneratePage() {
             setResults(result);
 
             if (result.content) {
-                const newProjectId = `proj_${Date.now()}`;
-                addProject({
-                    id: newProjectId,
+                const newProjectId = await addProject({
                     title: result.content.title,
                     status: 'Active',
                     contentItems: 1,
-                    lastUpdated: new Date().toISOString().split('T')[0],
                     content: result.content.content,
                     contentType: result.content.contentType,
                 });
