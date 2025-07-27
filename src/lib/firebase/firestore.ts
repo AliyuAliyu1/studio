@@ -1,14 +1,14 @@
-
 import { initFirebaseAdminApp } from "@/lib/firebase-admin";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-// This file is intended for server-side use only.
-// It is imported by server actions in `src/lib/firebase/actions.ts`.
-
 const app = initFirebaseAdminApp();
-const db = getFirestore(app);
+// The app might be a mock object if the service account is not set.
+// In that case, db will be null, and we'll handle it in the functions.
+const db = app.name !== '[DEFAULT]' ? getFirestore(app) : null;
 
 export const PROJECTS_COLLECTION = 'projects';
+export const MICROSITES_COLLECTION = 'microsites';
+
 
 export interface ProjectData {
     title: string;
@@ -23,7 +23,24 @@ export interface Project extends ProjectData {
   lastUpdated: string;
 }
 
+export interface Microsite {
+    id: string;
+    title: string;
+    slug: string;
+    html: string;
+    brandColor: string;
+    logoURL?: string;
+    createdAt: string;
+}
+
+
+// --- Project Functions ---
+
 export async function getProjects(): Promise<Project[]> {
+    if (!db) {
+        console.warn("Firestore is not initialized. Returning empty projects array.");
+        return [];
+    }
     try {
         const snapshot = await db.collection(PROJECTS_COLLECTION).orderBy('lastUpdated', 'desc').get();
         if (snapshot.empty) {
@@ -32,7 +49,6 @@ export async function getProjects(): Promise<Project[]> {
         return snapshot.docs.map(doc => {
             const data = doc.data();
             const lastUpdatedTimestamp = data.lastUpdated;
-            // Handle both Firestore Timestamp and ISO string formats
             const lastUpdated = lastUpdatedTimestamp?.toDate ? lastUpdatedTimestamp.toDate() : new Date(lastUpdatedTimestamp);
 
             return {
@@ -49,6 +65,10 @@ export async function getProjects(): Promise<Project[]> {
 
 
 export async function addProject(projectData: ProjectData): Promise<string> {
+     if (!db) {
+        console.warn("Firestore is not initialized. Cannot add project.");
+        return "mock-project-id";
+    }
     try {
         const docRef = await db.collection(PROJECTS_COLLECTION).add({
             ...projectData,
@@ -62,6 +82,10 @@ export async function addProject(projectData: ProjectData): Promise<string> {
 }
 
 export async function updateProject(id: string, updates: Partial<ProjectData>): Promise<void> {
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot update project.");
+        return;
+    }
     try {
         const docRef = db.collection(PROJECTS_COLLECTION).doc(id);
         await docRef.update({
@@ -75,10 +99,60 @@ export async function updateProject(id: string, updates: Partial<ProjectData>): 
 }
 
 export async function deleteProject(id: string): Promise<void> {
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot delete project.");
+        return;
+    }
     try {
         await db.collection(PROJECTS_COLLECTION).doc(id).delete();
     } catch (error) {
         console.error(`Error deleting project ${id}:`, error);
         throw new Error("Failed to delete project from Firestore.");
+    }
+}
+
+// --- Microsite Functions ---
+
+export async function addMicrosite(data: Omit<Microsite, 'id' | 'createdAt'>): Promise<string> {
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot add microsite.");
+        return "mock-microsite-id";
+    }
+    try {
+        const docRef = await db.collection(MICROSITES_COLLECTION).add({
+            ...data,
+            createdAt: FieldValue.serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error("Error adding microsite:", error);
+        throw new Error("Failed to add microsite to Firestore.");
+    }
+}
+
+export async function getMicrositeBySlug(slug: string): Promise<Microsite | null> {
+    if (!db) {
+        console.warn("Firestore is not initialized. Cannot get microsite.");
+        return null;
+    }
+    try {
+        const snapshot = await db.collection(MICROSITES_COLLECTION).where('slug', '==', slug).limit(1).get();
+        if (snapshot.empty) {
+            return null;
+        }
+        const doc = snapshot.docs[0];
+        const data = doc.data();
+        const createdAtTimestamp = data.createdAt;
+        const createdAt = createdAtTimestamp?.toDate ? createdAtTimestamp.toDate() : new Date(createdAtTimestamp);
+
+        return {
+            id: doc.id,
+            ...data,
+            createdAt: createdAt.toISOString(),
+        } as Microsite;
+
+    } catch (error) {
+        console.error(`Error getting microsite by slug ${slug}:`, error);
+        throw new Error("Failed to fetch microsite from Firestore.");
     }
 }

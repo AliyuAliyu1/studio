@@ -3,10 +3,11 @@
 
 import { analyzeFeedback, AnalyzeFeedbackOutput as AFOutput } from "@/ai/flows/analyze-feedback"
 import { generateContent, GenerateContentOutput as GCOutput } from "@/ai/flows/generate-content"
+import { addMicrosite } from "@/lib/firebase/firestore";
 import type { Project } from "@/lib/firebase/firestore";
 
 export type AnalyzeFeedbackOutput = AFOutput
-export type GenerateContentOutput = GCOutput & { contentType: string };
+export type GenerateContentOutput = GCOutput & { contentType: string, slug?: string };
 
 export async function generateAndAnalyze(
   feedback: string,
@@ -27,10 +28,21 @@ export async function generateAndAnalyze(
         contentTone,
       }),
     ])
+    
+    let slug;
+    if (contentType === 'microsite') {
+        slug = contentResult.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        await addMicrosite({
+            title: contentResult.title,
+            slug: slug,
+            html: contentResult.content,
+            brandColor: brandColor,
+        });
+    }
 
     return { 
         analysis: analysisResult, 
-        content: { ...contentResult, contentType }
+        content: { ...contentResult, contentType, slug }
     }
   } catch (error) {
     console.error("Error in generateAndAnalyze:", error)
