@@ -44,7 +44,7 @@ const prompt = ai.definePrompt({
   2. The second line MUST be '---'.
   3. The rest of the output MUST be the content itself.
 
-  {{#if isMicrosite}}
+  {{#if (eq contentType "microsite")}}
   Generate a beautiful, modern, and slick single-page HTML microsite based on the customer feedback.
   - The title on the first line should be a concise and descriptive title for the microsite.
   - The content (after the '---' separator) must be the full, self-contained HTML for the microsite, wrapped in a single \`<div>\` tag. Do not include \`<html>\` or \`<body>\` tags.
@@ -54,9 +54,7 @@ const prompt = ai.definePrompt({
   - Use icons from 'lucide-react' by providing inline SVG for them.
   - Add subtle animations and transitions using 'tailwindcss-animate' classes like 'animate-in', 'fade-in', 'slide-in-from-bottom'.
   - The content of the microsite should be based on the customer feedback provided.
-  {{/if}}
-  
-  {{#if isBlogPost}}
+  {{else}}
     {{#if previousContent}}
     A previous version of the content exists. Refine the following content based on the new customer feedback provided.
     Previous content:
@@ -64,33 +62,27 @@ const prompt = ai.definePrompt({
     {{{previousContent}}}
     ---
     {{else}}
-    Generate a new blog post based on the following customer feedback.
+    Generate new content based on the following customer feedback.
     {{/if}}
-  {{/if}}
 
-  {{#if isSocialMediaPost}}
-     {{#if previousContent}}
-    A previous version of the content exists. Refine the following content based on the new customer feedback provided.
-    Previous content:
-    ---
-    {{{previousContent}}}
-    ---
-    {{else}}
-    Generate a new social media post based on the following customer feedback.
+    Customer Feedback:
+    {{feedback}}
+
+    Use the following brand color: {{brandColor}}
+
+    {{#if logoDataUri}}
+    Use the following logo: {{media url=logoDataUri}}
     {{/if}}
-  {{/if}}
 
-  Customer Feedback:
-  {{feedback}}
+    {{#if contentTone}}
+    Use the following content tone: {{contentTone}}
+    {{/if}}
 
-  Use the following brand color: {{brandColor}}
-
-  {{#if logoDataUri}}
-  Use the following logo: {{media url=logoDataUri}}
-  {{/if}}
-
-  {{#if contentTone}}
-  Use the following content tone: {{contentTone}}
+    {{#if (eq contentType "blog_post")}}
+    The content (after '---') should be a new blog post.
+    {{else if (eq contentType "social_media_post")}}
+    The content (after '---') should be a new social media post.
+    {{/if}}
   {{/if}}
   `,
 });
@@ -102,12 +94,9 @@ const generateContentFlow = ai.defineFlow(
     outputSchema: GenerateContentOutputSchema,
   },
   async (input): Promise<GenerateContentOutput> => {
-    // Sanitize input and add boolean flags for Handlebars
+    // Sanitize input before passing to the prompt
     const sanitizedInput = {
       ...input,
-      isMicrosite: input.contentType === 'microsite',
-      isBlogPost: input.contentType === 'blog_post',
-      isSocialMediaPost: input.contentType === 'social_media_post',
       logoDataUri: input.logoDataUri || undefined,
       contentTone: input.contentTone || undefined,
       previousContent: input.previousContent || undefined,
