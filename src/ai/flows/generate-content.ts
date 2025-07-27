@@ -94,8 +94,16 @@ const generateContentFlow = ai.defineFlow(
     outputSchema: GenerateContentOutputSchema,
   },
   async (input): Promise<GenerateContentOutput> => {
+    // Sanitize input before passing to the prompt
+    const sanitizedInput = {
+      ...input,
+      logoDataUri: input.logoDataUri || undefined,
+      contentTone: input.contentTone || undefined,
+      previousContent: input.previousContent || undefined,
+    };
+    
     // We get the raw text response from the model.
-    const response = await prompt(input);
+    const response = await prompt(sanitizedInput);
     const rawText = response.text;
 
     if (!rawText) {
