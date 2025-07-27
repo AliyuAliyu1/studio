@@ -63,30 +63,31 @@ const pricingTiers = [
     name: 'Free',
     price: '$0',
     period: '/ month',
-    description: 'Get started with our basic features.',
+    description: 'For individuals and small projects to get started.',
     features: [
-      'Analyze up to 10 feedback entries',
-      'Generate 5 pieces of content',
+      'Analyze up to 100 feedback entries/month',
+      'Generate 10 content pieces (posts/sites)',
       'Basic sentiment analysis',
       'Community support',
     ],
-    cta: 'Sign up for free',
+    cta: 'Get Started for Free',
     href: '/signup',
     variant: 'outline',
   },
   {
     name: 'Pro',
-    price: '$29',
+    price: '$49',
     period: '/ month',
-    description: 'For professionals who need more power.',
+    description: 'For professionals and teams who need more power.',
     features: [
-      'Analyze up to 1000 feedback entries',
+      'Analyze up to 2,000 feedback entries/month',
       'Unlimited content generation',
       'Advanced sentiment and theme analysis',
-      'Email & chat support',
+      'Custom branding options',
+      'Priority Email & Chat support',
       'Export content to HTML/Markdown'
     ],
-    cta: 'Get Started',
+    cta: 'Start Your Free Trial',
     href: '/signup',
     variant: 'default',
     popular: true,
@@ -95,16 +96,16 @@ const pricingTiers = [
     name: 'Enterprise',
     price: 'Contact Us',
     period: '',
-    description: 'For large teams with custom needs.',
+    description: 'For large organizations with custom needs.',
     features: [
-      'Unlimited everything',
-      'Custom branding',
-      'API Access',
-      'Dedicated account manager',
+      'Unlimited everything from Pro',
+      'Advanced security & compliance (SSO)',
+      'API Access for custom integrations',
+      'Dedicated account manager & onboarding',
       'On-premise deployment options',
     ],
     cta: 'Contact Sales',
-    href: '#',
+    href: '/contact',
     variant: 'outline',
   },
 ];
@@ -118,11 +119,11 @@ export default function PricingPage() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
+                 <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl font-headline">
                   Simple, Transparent Pricing
                 </h1>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Choose the plan that's right for your business.
+                  Choose the plan that's right for your business. No hidden fees, ever.
                 </p>
               </div>
             </div>
@@ -131,30 +132,30 @@ export default function PricingPage() {
 
         <section className="w-full pb-12 md:pb-24 lg:pb-32">
           <div className="container px-4 md:px-6">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 items-stretch">
               {pricingTiers.map((tier) => (
-                <Card key={tier.name} className={`flex flex-col ${tier.popular ? 'border-primary shadow-lg' : ''}`}>
-                  <CardHeader className="p-6">
-                    {tier.popular && <div className="text-sm font-bold text-primary text-center mb-2">MOST POPULAR</div>}
-                    <CardTitle className="text-3xl font-bold text-center">{tier.name}</CardTitle>
-                    <div className="flex items-baseline justify-center gap-1 mt-4">
-                      <span className="text-4xl font-bold">{tier.price}</span>
+                <Card key={tier.name} className={`flex flex-col ${tier.popular ? 'border-primary shadow-2xl scale-105' : 'shadow-lg'}`}>
+                    {tier.popular && <div className="bg-primary text-primary-foreground text-sm font-bold text-center py-1 rounded-t-lg">MOST POPULAR</div>}
+                  <CardHeader className="p-8">
+                    <CardTitle className="text-3xl font-bold">{tier.name}</CardTitle>
+                     <div className="flex items-baseline gap-1 mt-4">
+                      <span className="text-4xl font-extrabold">{tier.price}</span>
                       {tier.period && <span className="text-muted-foreground">{tier.period}</span>}
                     </div>
-                    <CardDescription className="text-center mt-2">{tier.description}</CardDescription>
+                    <CardDescription className="pt-2 h-12">{tier.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 p-6 pt-0">
-                    <ul className="space-y-3">
+                  <CardContent className="flex-1 p-8 pt-0">
+                    <ul className="space-y-4">
                       {tier.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-2">
-                          <Check className="h-5 w-5 text-green-500" />
+                        <li key={feature} className="flex items-start gap-3">
+                          <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
                           <span className="text-muted-foreground">{feature}</span>
                         </li>
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="p-6">
-                    <Button asChild className="w-full" variant={tier.variant as any}>
+                  <CardFooter className="p-8">
+                    <Button asChild className="w-full" size="lg" variant={tier.variant as any}>
                       <Link href={tier.href}>{tier.cta}</Link>
                     </Button>
                   </CardFooter>

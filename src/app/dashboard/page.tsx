@@ -6,11 +6,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, TrendingUp, Sparkles, Pencil, Share2, Eye, Search, Play, MoreHorizontal, Globe } from "lucide-react"
+import { Upload, FileText, ClipboardPaste, MessageSquare, Star, LifeBuoy, TrendingUp, Sparkles, Pencil, Share2, Eye, Search, Play, MoreHorizontal, Globe, Loader2, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -18,46 +19,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-
-const recentProjects = [
-    {
-        id: 'p_1',
-        type: 'Blog Post',
-        title: 'Customer Success Stories',
-        description: 'Generated from 47 positive reviews',
-        date: '2 days ago',
-        action: 'Edit',
-        variant: 'default',
-        icon: <Pencil className="mr-2 h-4 w-4" />
-    },
-    {
-        id: 'p_2',
-        type: 'Social Media',
-        title: 'Product Launch Posts',
-        description: 'From recent product feeback',
-        date: '5 days ago',
-        action: 'Share',
-        variant: 'secondary',
-        icon: <Share2 className="mr-2 h-4 w-4" />
-    },
-    {
-        id: 'p_3',
-        type: 'Microsite',
-        title: 'Feature Testimonials',
-        description: 'Showcase for new checkout',
-        date: '1 week ago',
-        action: 'View',
-        variant: 'outline',
-        icon: <Eye className="mr-2 h-4 w-4" />
-    }
-]
+import { useProjectsStore } from "@/lib/projects-store";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [feedback, setFeedback] = useState('');
     const [pastedFeedback, setPastedFeedback] = useState('');
     const { toast } = useToast();
+    const { projects } = useProjectsStore();
+
+    const [feedback, setFeedback] = useState('');
   
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -91,191 +63,177 @@ export default function DashboardPage() {
         router.push("/dashboard/generate");
     };
 
-
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
         <div>
-            <h1 className="text-3xl font-bold font-headline">Welcome back, John</h1>
-            <p className="text-muted-foreground">Ready to transform customer feedback into compelling content?</p>
+            <h1 className="text-3xl font-bold font-headline">Welcome Back!</h1>
+            <p className="text-muted-foreground">Here&apos;s a snapshot of your content generation workspace.</p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{projects.length}</div>
+                    <p className="text-xs text-muted-foreground">+2 since last month</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Positive Sentiment</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">84%</div>
+                    <p className="text-xs text-muted-foreground">Up by 5% this week</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Content Generated</CardTitle>
+                    <Sparkles className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">12</div>
+                    <p className="text-xs text-muted-foreground">New blog posts this week</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">New Themes</CardTitle>
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">3</div>
+                    <p className="text-xs text-muted-foreground">"UI," "speed," "support"</p>
+                </CardContent>
+            </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-                <Card className="h-full">
-                    <CardHeader className="text-center p-8">
-                        <div className="mx-auto bg-primary/10 rounded-full p-3 w-fit mb-4">
-                            <Upload className="h-8 w-8 text-primary" />
-                        </div>
-                        <CardTitle className="font-headline text-2xl">Upload New Feedback</CardTitle>
-                        <CardDescription>Start by uploading customer feedback from surveys, reviews, or support tickets</CardDescription>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">Start a New Project</CardTitle>
+                        <CardDescription>
+                            Provide customer feedback below, then choose what you want to create.
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6 px-8 pb-8">
-                        <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 bg-primary/5">
-                        <input
+                    <CardContent className="space-y-4">
+                        {feedback ? (
+                             <div className="border-2 border-dashed border-green-500 rounded-lg p-6 text-center bg-green-50">
+                                <h3 className="text-lg font-semibold text-green-800">Feedback Loaded!</h3>
+                                <p className="text-muted-foreground text-sm mt-1">{feedback.substring(0, 100)}...</p>
+                                 <Button variant="link" size="sm" onClick={() => setFeedback('')}>Clear feedback</Button>
+                            </div>
+                        ) : (
+                        <div className="space-y-2">
+                            <Label htmlFor="feedback-text-main">Paste Feedback</Label>
+                            <Textarea
+                                id="feedback-text-main"
+                                placeholder="Paste your customer feedback text here..."
+                                className="min-h-[150px]"
+                                value={pastedFeedback}
+                                onChange={(e) => setPastedFeedback(e.target.value)}
+                            />
+                            <div className="flex justify-end">
+                                <Button size="sm" onClick={() => {
+                                    setFeedback(pastedFeedback);
+                                    toast({ title: "Feedback Loaded!"})
+                                }}>Load Feedback</Button>
+                            </div>
+                        </div>
+                        )}
+                        
+                        <div className="flex justify-center items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex-1 border-t"></span>
+                            <span>OR</span>
+                            <span className="flex-1 border-t"></span>
+                        </div>
+                         <input
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             className="hidden"
-                            accept=".csv,.json,.txt,.xlsx"
+                            accept=".csv,.json,.txt"
                         />
-                            <div className="flex justify-center gap-4 mb-2">
-                                <Button className="bg-indigo-600 hover:bg-indigo-700" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Choose Files</Button>
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline" className="bg-white"><ClipboardPaste className="mr-2 h-4 w-4" /> Paste Text</Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                        <DialogTitle>Paste Feedback</DialogTitle>
-                                        <DialogDescription>
-                                            Paste your customer feedback text below.
-                                        </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <Label htmlFor="feedback-text" className="sr-only">
-                                                Feedback
-                                            </Label>
-                                            <Textarea
-                                                id="feedback-text"
-                                                placeholder="Paste your feedback here..."
-                                                className="min-h-[200px]"
-                                                value={pastedFeedback}
-                                                onChange={(e) => setPastedFeedback(e.target.value)}
-                                            />
-                                        </div>
-                                        <DialogFooter>
-                                            <DialogClose asChild>
-                                                <Button type="button" onClick={() => {
-                                                    setFeedback(pastedFeedback);
-                                                    setPastedFeedback('');
-                                                    toast({
-                                                        title: "Feedback Saved!",
-                                                        description: "Your pasted feedback has been loaded.",
-                                                    })
-                                                }}>Save feedback</Button>
-                                            </DialogClose>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            </div>
-                            <p className="text-center text-xs text-muted-foreground">Supports CSV, Excel, JSON, or plain text files</p>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4">
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
-                                <MessageSquare />
-                                <span>Survey Data</span>
-                            </Button>
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
-                                <Star />
-                                <span>Reviews</span>
-                            </Button>
-                            <Button variant="outline" className="h-auto py-4 flex-col gap-2 bg-white">
-                                <LifeBuoy />
-                                <span>Support Tickets</span>
-                            </Button>
-                        </div>
+                        <Button className="w-full" variant="outline" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2 h-4 w-4" /> Upload from a File</Button>
+
                     </CardContent>
+                    <CardFooter className="flex flex-col items-start gap-4">
+                        <Label>What do you want to generate?</Label>
+                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                            <Button variant="default" className="w-full" size="lg" onClick={() => handleGenerateContent('blog_post')} disabled={!feedback}>
+                                <FileText className="mr-2 h-4 w-4" />Blog Post
+                           </Button>
+                           <Button variant="default" className="w-full" size="lg" onClick={() => handleGenerateContent('social_media_post')} disabled={!feedback}>
+                               <Share2 className="mr-2 h-4 w-4" />Social Media
+                           </Button>
+                           <Button variant="default" className="w-full" size="lg" onClick={() => handleGenerateContent('microsite')} disabled={!feedback}>
+                               <Globe className="mr-2 h-4 w-4" />Microsite
+                           </Button>
+                       </div>
+                    </CardFooter>
                 </Card>
             </div>
             <div className="space-y-8">
                 <Card>
-                    <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-2">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                           <TrendingUp className="h-6 w-6 text-green-600" />
-                        </div>
-                        <div>
-                            <CardTitle className="text-base font-semibold">Quick Stats</CardTitle>
-                            <CardDescription>Your recent activity</CardDescription>
-                        </div>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-xl">Recent Projects</CardTitle>
+                        <CardDescription>
+                            Pick up where you left off.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
-                       <div className="space-y-2 text-sm pt-2">
-                           <div className="flex justify-between">
-                               <span>Total Feedback</span>
-                               <span className="font-medium">1,247</span>
-                           </div>
-                           <div className="flex justify-between">
-                               <span>Generated Content</span>
-                               <span className="font-medium">34</span>
-                           </div>
-                           <div className="flex justify-between items-center">
-                               <span>This Month</span>
-                               <Badge className="bg-green-100 text-green-700 hover:bg-green-200 font-medium">+23%</Badge>
-                           </div>
+                       <div className="space-y-4">
+                           {projects.length > 0 ? projects.slice(0,3).map(project => (
+                            <Link href={`/dashboard/editor/${project.id}`} key={project.id}>
+                                <div className="flex items-center gap-4 hover:bg-muted p-2 rounded-lg">
+                                    <div className="p-2 bg-muted rounded-md">
+                                        <FileText className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold">{project.title}</p>
+                                        <p className="text-sm text-muted-foreground">{project.contentType.replace('_', ' ')}</p>
+                                    </div>
+                                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                            </Link>
+                           )) : (
+                            <>
+                                <div className="flex items-center gap-4 p-2">
+                                     <Skeleton className="h-10 w-10 rounded-md" />
+                                     <div className="space-y-2 flex-1">
+                                        <Skeleton className="h-4 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                     </div>
+                                </div>
+                                <div className="flex items-center gap-4 p-2">
+                                     <Skeleton className="h-10 w-10 rounded-md" />
+                                     <div className="space-y-2 flex-1">
+                                        <Skeleton className="h-4 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2" />
+                                     </div>
+                                </div>
+                            </>
+                           )}
                        </div>
                     </CardContent>
+                    <CardFooter>
+                         <Button asChild className="w-full" variant="outline">
+                            <Link href="/dashboard/projects">
+                                View All Projects
+                            </Link>
+                        </Button>
+                    </CardFooter>
                 </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-2">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                           <Sparkles className="h-6 w-6 text-purple-600" />
-                        </div>
-                        <div>
-                            <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
-                            <CardDescription>Get started fast</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                       <div className="space-y-1 pt-2">
-                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('blog_post')}>
-                               <FileText className="h-4 w-4" /> Generate Blog Post
-                           </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('social_media_post')}>
-                               <Share2 className="h-4 w-4" /> Create Social Media
-                           </Button>
-                           <Button variant="ghost" className="w-full justify-start gap-2 pl-2" onClick={() => handleGenerateContent('microsite')}>
-                               <Globe className="h-4 w-4" /> Build Microsite
-                           </Button>
-                       </div>
-                    </CardContent>
-                </Card>
+                 
             </div>
         </div>
         
-        <div>
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold font-headline">Recent Projects</h2>
-                <Button variant="ghost"><Eye className="mr-2 h-4 w-4"/> View All</Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recentProjects.map(project => (
-                    <Card key={project.id}>
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <Badge variant="outline" className="mb-2">{project.type}</Badge>
-                                    <CardTitle className="text-lg">{project.title}</CardTitle>
-                                    <CardDescription>{project.description}</CardDescription>
-                                </div>
-                                <Button variant="ghost" size="icon">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="flex justify-between items-center">
-                           <span className="text-sm text-muted-foreground">{project.date}</span>
-                           <Button variant={project.variant as any} size="sm">{project.icon} {project.action}</Button>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
-
-        <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-full">
-                    <Search className="h-8 w-8 text-blue-600" />
-                </div>
-                <div>
-                    <h3 className="font-bold text-lg">Generate Content from Existing Data</h3>
-                    <p className="text-muted-foreground">You have 1,247 feedback entries ready to transform into content</p>
-                </div>
-            </div>
-            <div className="flex gap-2">
-                <Button variant="outline" className="bg-white">View Analysis</Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => handleGenerateContent('blog_post')}><Play className="mr-2 h-4 w-4 fill-current"/> Start Creating</Button>
-            </div>
-        </div>
     </div>
   )
 }
